@@ -65,55 +65,64 @@ class AdminController extends Controller
      *  SETTINGS
      * ────────────────────────────────────────── */
 
-    public function saveSettings(Request $request)
-    {
-        $data = $request->validate([
-            'site_name'       => 'required|string|max:100',
-            'site_tagline'    => 'nullable|string|max:200',
-            'about_title'     => 'nullable|string|max:200',
-            'about_text'      => 'nullable|string',
-            'founded_year'    => 'nullable|digits:4',
-            'hero_type'       => 'required|in:image,video_upload,youtube',
-            'hero_title'      => 'nullable|string|max:200',
-            'hero_subtitle'   => 'nullable|string|max:300',
-            'hero_youtube'    => 'nullable|url',
-            'contact_email'   => 'nullable|email',
-            'contact_phone'   => 'nullable|string|max:50',
-            'contact_address' => 'nullable|string|max:255',
-            'facebook'        => 'nullable|url',
-            'instagram'       => 'nullable|url',
-            'youtube'         => 'nullable|url',
-            'footer_text'     => 'nullable|string|max:255',
-            'logo'            => 'nullable|image|max:2048',
-            'about_image'     => 'nullable|image|max:4096',
-            'hero_image'      => 'nullable|image|max:8192',
-            'hero_video_file' => 'nullable|mimetypes:video/mp4,video/webm|max:204800',
-        ]);
+public function saveSettings(Request $request)
+{
+    $request->validate([
+        'site_name'       => 'required|string|max:100',
+        'site_tagline'    => 'nullable|string|max:200',
+        'about_title'     => 'nullable|string|max:200',
+        'about_text'      => 'nullable|string',
+        'founded_year'    => 'nullable|digits:4',
+        'hero_type'       => 'nullable|in:image,video_upload,youtube',
+        'hero_title'      => 'nullable|string|max:200',
+        'hero_subtitle'   => 'nullable|string|max:300',
+        'hero_youtube'    => 'nullable|url',
+        'contact_email'   => 'nullable|email',
+        'contact_phone'   => 'nullable|string|max:50',
+        'contact_address' => 'nullable|string|max:255',
+        'facebook'        => 'nullable|url',
+        'instagram'       => 'nullable|url',
+        'youtube'         => 'nullable|url',
+        'footer_text'     => 'nullable|string|max:255',
+        'logo'            => 'nullable|image|max:2048',
+        'about_image'     => 'nullable|image|max:4096',
+        'hero_image'      => 'nullable|image|max:8192',
+        'hero_video_file' => 'nullable|mimetypes:video/mp4,video/webm|max:204800',
+    ]);
 
-        $fileFields = ['logo', 'about_image', 'hero_image', 'hero_video_file'];
+    // ── File uploads ──────────────────────────────
+    $fileFields = ['logo', 'about_image', 'hero_image', 'hero_video_file'];
 
-        foreach ($fileFields as $field) {
-            if ($request->hasFile($field)) {
-                $old = SiteSetting::get($field);
-                if ($old) Storage::disk('public')->delete($old);
-                $path = $request->file($field)->store("settings/{$field}", 'public');
-                SiteSetting::set($field, $path);
-            }
+    foreach ($fileFields as $field) {
+        if ($request->hasFile($field)) {
+            $old = SiteSetting::get($field);
+            if ($old) Storage::disk('public')->delete($old);
+            $path = $request->file($field)->store("settings/{$field}", 'public');
+            SiteSetting::set($field, $path);
         }
+    }
 
-        $textFields = [
-            'site_name', 'site_tagline', 'about_title', 'about_text', 'founded_year',
-            'hero_type', 'hero_title', 'hero_subtitle', 'hero_youtube',
-            'contact_email', 'contact_phone', 'contact_address',
-            'facebook', 'instagram', 'youtube', 'footer_text',
-        ];
+    // ── Text fields — only save if present in request ──
+    $textFields = [
+        'site_name', 'site_tagline', 'about_title', 'about_text', 'founded_year',
+        'hero_title', 'hero_subtitle', 'hero_youtube',
+        'contact_email', 'contact_phone', 'contact_address',
+        'facebook', 'instagram', 'youtube', 'footer_text',
+    ];
 
-        foreach ($textFields as $field) {
+    foreach ($textFields as $field) {
+        if ($request->has($field)) {
             SiteSetting::set($field, $request->input($field, ''));
         }
-
-        return back()->with('success', 'Settings saved successfully.');
     }
+
+    // ── hero_type — only update if submitted ──────
+    if ($request->filled('hero_type')) {
+        SiteSetting::set('hero_type', $request->input('hero_type'));
+    }
+
+    return back()->with('success', 'Settings saved successfully.');
+}
 
     /* ──────────────────────────────────────────
      *  MOVIES

@@ -503,7 +503,7 @@
                                     onchange="previewFile(this,'logo-preview','logo-name')">
                             </div>
                             @if(!empty($settings['logo']))
-                            <img src="{{ Storage::url($settings['logo']) }}" class="file-preview" id="logo-preview">
+                            <img src="{{ asset('uploads/' . $settings['logo']) }}" class="file-preview" id="logo-preview">
                             @else
                             <img class="file-preview" id="logo-preview" style="display:none;">
                             @endif
@@ -536,7 +536,7 @@
                                     onchange="previewFile(this,'about-img-preview','about-img-name')">
                             </div>
                             @if(!empty($settings['about_image']))
-                            <img src="{{ Storage::url($settings['about_image']) }}" class="file-preview" id="about-img-preview">
+                            <img src="{{ asset('uploads/' . $settings['about_image']) }}" class="file-preview" id="about-img-preview">
                             @else
                             <img class="file-preview" id="about-img-preview" style="display:none;">
                             @endif
@@ -660,7 +660,7 @@
                                 onchange="previewFile(this,'hero-img-preview','hero-img-name')">
                         </div>
                         @if(!empty($settings['hero_image']))
-                        <img src="{{ Storage::url($settings['hero_image']) }}" class="file-preview" id="hero-img-preview" style="max-width:200px;max-height:120px;">
+                        <img src="{{ asset('uploads/' . $settings['hero_image']) }}" class="file-preview" id="hero-img-preview" style="max-width:200px;max-height:120px;">
                         @else
                         <img class="file-preview" id="hero-img-preview" style="display:none;max-width:200px;max-height:120px;">
                         @endif
@@ -763,7 +763,7 @@
                             onchange="previewFile(this,'timer-img-preview','')">
                     </div>
                     @if(!empty($settings['timer_image']))
-                    <img src="{{ Storage::url($settings['timer_image']) }}" class="file-preview" id="timer-img-preview" style="max-width:200px;max-height:100px;margin-top:8px;">
+                    <img src="{{ asset('uploads/' . $settings['timer_image']) }}" class="file-preview" id="timer-img-preview" style="max-width:200px;max-height:100px;margin-top:8px;">
                     @endif
                 </div>
             </div>
@@ -835,7 +835,7 @@
         @forelse($banners as $banner)
         <div style="background:var(--dark2);border:1px solid var(--border);overflow:hidden;border-radius:2px;">
             @if($banner->image)
-            <img src="{{ Storage::url($banner->image) }}"
+            <img src="{{ asset('uploads/' . $banner->image) }}"
                  style="width:100%;aspect-ratio:2/3;object-fit:cover;display:block;">
             @else
             <div style="width:100%;aspect-ratio:2/3;background:var(--dark3);display:flex;align-items:center;justify-content:center;">
@@ -915,7 +915,7 @@
             @forelse($movies as $movie)
             <div class="item-card">
                 @if($movie->poster)
-                <img src="{{ Storage::url($movie->poster) }}" class="item-thumb" alt="{{ $movie->title }}">
+                <img src="{{ asset('uploads/' . $movie->poster) }}" class="item-thumb" alt="{{ $movie->title }}">
                 @else
                 <div class="item-thumb" style="display:flex;align-items:center;justify-content:center;">
                     <i class="fas fa-film" style="color:rgba(255,255,255,.1);font-size:1.5rem;"></i>
@@ -986,7 +986,7 @@
             @forelse($characters as $char)
             <div class="item-card">
                 @if($char->photo)
-                <img src="{{ Storage::url($char->photo) }}" class="item-thumb" alt="{{ $char->name }}"
+                <img src="{{ asset('uploads/' . $char->photo) }}" class="item-thumb" alt="{{ $char->name }}"
                     style="aspect-ratio:3/4;width:72px;height:90px;object-position:top;">
                 @else
                 <div class="item-thumb" style="display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:rgba(255,255,255,.1);">

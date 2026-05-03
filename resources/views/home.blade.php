@@ -1289,7 +1289,7 @@ textarea.cf-field { resize: none; }
 <section id="countdown-section">
     <div class="countdown-bg">
         @if(!empty($settings['timer_image']))
-            <img src="{{ $settings['timer_image']) }}" alt="Countdown Banner">
+            <img src="{{  asset('uploads/' . $settings['timer_image']) }}" alt="Countdown Banner">
         @else
             <div class="countdown-bg-fallback"></div>
         @endif

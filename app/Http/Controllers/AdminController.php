@@ -89,6 +89,7 @@ private function deleteFile(?string $path): void
 
     public function saveSettings(Request $request)
     {
+        return $request;
         $request->validate([
             'site_name'       => 'required|string|max:100',
             'site_tagline'    => 'nullable|string|max:200',

@@ -1738,10 +1738,10 @@ const MOVIES = {
         duration:  @json($movie->duration ? $movie->duration . ' min' : ''),
         rating:    @json($movie->rating ?? ''),
         desc:      @json($movie->description ?? ''),
-        banner:    @json($movie->banner ? Storage::url($movie->banner) : ($movie->poster ? Storage::url($movie->poster) : '')),
+        banner:    @json($movie->banner ? asset('uploads/' . $movie->banner) : ($movie->poster ? asset('uploads/' . $movie->poster) : '')),
         videoType: @json($movie->video_type ?? 'youtube'),
         videoYt:   @json($movie->youtube_embed ?? ''),
-        videoFile: @json($movie->video_file ? Storage::url($movie->video_file) : ''),
+        videoFile: @json($movie->video_file ? asset('uploads/' . $movie->video_file) : ''),
         cast:      @json($movie->characters->pluck('name')->join(', ')),
     },
     @endforeach

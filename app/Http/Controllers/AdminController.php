@@ -7,15 +7,13 @@ use App\Models\Movie;
 use App\Models\SiteSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class AdminController extends Controller
 {
-    /* ──────────────────────────────────────────
-     *  AUTH
-     * ────────────────────────────────────────── */
+    /* ══════════════════════════════════════
+       AUTH
+    ══════════════════════════════════════ */
 
     public function loginForm()
     {
@@ -48,9 +46,9 @@ class AdminController extends Controller
         return redirect()->route('admin.login');
     }
 
-    /* ──────────────────────────────────────────
-     *  PANEL
-     * ────────────────────────────────────────── */
+    /* ══════════════════════════════════════
+       PANEL
+    ══════════════════════════════════════ */
 
     public function panel()
     {
@@ -61,76 +59,130 @@ class AdminController extends Controller
         return view('admin.panel', compact('settings', 'movies', 'characters', 'banners'));
     }
 
-    /* ──────────────────────────────────────────
-     *  SETTINGS
-     * ────────────────────────────────────────── */
+    /* ══════════════════════════════════════
+       HELPER — upload file to public/uploads
+    ══════════════════════════════════════ */
 
-public function saveSettings(Request $request)
+private function uploadFile($file, string $folder): string
 {
-    $request->validate([
-        'site_name'       => 'required|string|max:100',
-        'site_tagline'    => 'nullable|string|max:200',
-        'about_title'     => 'nullable|string|max:200',
-        'about_text'      => 'nullable|string',
-        'founded_year'    => 'nullable|digits:4',
-        'hero_type'       => 'nullable|in:image,video_upload,youtube',
-        'hero_title'      => 'nullable|string|max:200',
-        'hero_subtitle'   => 'nullable|string|max:300',
-        'hero_youtube'    => 'nullable|url',
-        'contact_email'   => 'nullable|email',
-        'contact_phone'   => 'nullable|string|max:50',
-        'contact_address' => 'nullable|string|max:255',
-        'facebook'        => 'nullable|url',
-        'instagram'       => 'nullable|url',
-        'youtube'         => 'nullable|url',
-        'footer_text'     => 'nullable|string|max:255',
-        'logo'            => 'nullable|image|max:2048',
-        'about_image'     => 'nullable|image|max:4096',
-        'hero_image'      => 'nullable|image|max:8192',
-        'hero_video_file' => 'nullable|mimetypes:video/mp4,video/webm|max:204800',
-    ]);
+    $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+    $destination = public_path('uploads/' . $folder);
 
-    // ── File uploads ──────────────────────────────
-    $fileFields = ['logo', 'about_image', 'hero_image', 'hero_video_file'];
-
-    foreach ($fileFields as $field) {
-        if ($request->hasFile($field)) {
-            $old = SiteSetting::get($field);
-            if ($old) Storage::disk('public')->delete($old);
-            $path = $request->file($field)->store("settings/{$field}", 'public');
-            SiteSetting::set($field, $path);
-        }
+    // Create folder if it doesn't exist
+    if (!file_exists($destination)) {
+        mkdir($destination, 0755, true);
     }
 
-    // ── Text fields — only save if present in request ──
-    $textFields = [
-        'site_name', 'site_tagline', 'about_title', 'about_text', 'founded_year',
-        'hero_title', 'hero_subtitle', 'hero_youtube',
-        'contact_email', 'contact_phone', 'contact_address',
-        'facebook', 'instagram', 'youtube', 'footer_text',
-    ];
-
-    foreach ($textFields as $field) {
-        if ($request->has($field)) {
-            SiteSetting::set($field, $request->input($field, ''));
-        }
+    $file->move($destination, $filename);
+    return $folder . '/' . $filename;
+}
+private function deleteFile(?string $path): void
+{
+    if ($path && file_exists(public_path('uploads/' . $path))) {
+        unlink(public_path('uploads/' . $path));
     }
-
-    // ── hero_type — only update if submitted ──────
-    if ($request->filled('hero_type')) {
-        SiteSetting::set('hero_type', $request->input('hero_type'));
-    }
-
-    return back()->with('success', 'Settings saved successfully.');
 }
 
-    /* ──────────────────────────────────────────
-     *  MOVIES
-     * ────────────────────────────────────────── */
+    /* ══════════════════════════════════════
+       SETTINGS
+    ══════════════════════════════════════ */
+
+    public function saveSettings(Request $request)
+    {
+        $request->validate([
+            'site_name'       => 'required|string|max:100',
+            'site_tagline'    => 'nullable|string|max:200',
+            'about_title'     => 'nullable|string|max:200',
+            'about_text'      => 'nullable|string',
+            'founded_year'    => 'nullable|digits:4',
+            'hero_type'       => 'nullable|in:image,video_upload,youtube',
+            'hero_title'      => 'nullable|string|max:200',
+            'hero_subtitle'   => 'nullable|string|max:300',
+            'hero_youtube'    => 'nullable|url',
+            'contact_email'   => 'nullable|email',
+            'contact_phone'   => 'nullable|string|max:50',
+            'contact_address' => 'nullable|string|max:255',
+            'facebook'        => 'nullable|url',
+            'instagram'       => 'nullable|url',
+            'youtube'         => 'nullable|url',
+            'footer_text'     => 'nullable|string|max:255',
+            'logo'            => 'nullable|image|max:2048',
+            'about_image'     => 'nullable|image|max:4096',
+            'hero_image'      => 'nullable|image|max:8192',
+            'hero_video_file' => 'nullable|mimetypes:video/mp4,video/webm|max:204800',
+        ]);
+
+        // File uploads
+        $fileMap = [
+            'logo'            => 'settings/logo',
+            'about_image'     => 'settings/about_image',
+            'hero_image'      => 'settings/hero_image',
+            'hero_video_file' => 'settings/hero_video_file',
+        ];
+
+        foreach ($fileMap as $field => $folder) {
+            if ($request->hasFile($field)) {
+                $this->deleteFile(SiteSetting::get($field));
+                SiteSetting::set($field, $this->uploadFile($request->file($field), $folder));
+            }
+        }
+
+        // Text fields
+        $textFields = [
+            'site_name', 'site_tagline', 'about_title', 'about_text', 'founded_year',
+            'hero_title', 'hero_subtitle', 'hero_youtube',
+            'contact_email', 'contact_phone', 'contact_address',
+            'facebook', 'instagram', 'youtube', 'footer_text',
+        ];
+
+        foreach ($textFields as $field) {
+            if ($request->has($field)) {
+                SiteSetting::set($field, $request->input($field, ''));
+            }
+        }
+
+        if ($request->filled('hero_type')) {
+            SiteSetting::set('hero_type', $request->input('hero_type'));
+        }
+
+        return back()->with('success', 'Settings saved successfully.');
+    }
+
+    /* ══════════════════════════════════════
+       TIMER
+    ══════════════════════════════════════ */
+
+    public function saveTimerSettings(Request $request)
+    {
+        $request->validate([
+            'timer_title'    => 'nullable|string|max:200',
+            'timer_subtitle' => 'nullable|string|max:300',
+            'timer_date'     => 'nullable|date',
+            'timer_image'    => 'nullable|image|max:8192',
+            'timer_active'   => 'nullable|boolean',
+        ]);
+
+        foreach (['timer_title', 'timer_subtitle', 'timer_date'] as $f) {
+            SiteSetting::set($f, $request->input($f, ''));
+        }
+
+        SiteSetting::set('timer_active', $request->boolean('timer_active') ? '1' : '0');
+
+        if ($request->hasFile('timer_image')) {
+            $this->deleteFile(SiteSetting::get('timer_image'));
+            SiteSetting::set('timer_image', $this->uploadFile($request->file('timer_image'), 'settings/timer'));
+        }
+
+        return back()->with('success', 'Timer settings saved.');
+    }
+
+    /* ══════════════════════════════════════
+       MOVIES
+    ══════════════════════════════════════ */
 
     public function storeMovie(Request $request)
     {
-        $data = $request->validate([
+        $request->validate([
             'title'         => 'required|string|max:200',
             'genre'         => 'nullable|string|max:100',
             'year'          => 'nullable|digits:4',
@@ -148,26 +200,28 @@ public function saveSettings(Request $request)
 
         $movie = new Movie();
         $movie->fill([
-            'title'       => $data['title'],
-            'genre'       => $data['genre'] ?? null,
-            'year'        => $data['year'] ?? null,
-            'description' => $data['description'] ?? null,
-            'rating'      => $data['rating'] ?? null,
-            'duration'    => $data['duration'] ?? null,
-            'is_featured' => $request->boolean('is_featured'),
-            'sort_order'  => $data['sort_order'] ?? 0,
-            'video_type'  => $data['video_type'],
-            'video_youtube' => $data['video_youtube'] ?? null,
+            'title'         => $request->title,
+            'genre'         => $request->genre,
+            'year'          => $request->year,
+            'description'   => $request->description,
+            'rating'        => $request->rating,
+            'duration'      => $request->duration,
+            'is_featured'   => $request->boolean('is_featured'),
+            'sort_order'    => $request->input('sort_order', 0),
+            'video_type'    => $request->video_type,
+            'video_youtube' => $request->video_youtube,
         ]);
 
-        foreach (['poster', 'banner'] as $img) {
-            if ($request->hasFile($img)) {
-                $movie->$img = $request->file($img)->store("movies/{$img}", 'public');
-            }
+        if ($request->hasFile('poster')) {
+            $movie->poster = $this->uploadFile($request->file('poster'), 'movies/poster');
+        }
+
+        if ($request->hasFile('banner')) {
+            $movie->banner = $this->uploadFile($request->file('banner'), 'movies/banner');
         }
 
         if ($request->hasFile('video_file')) {
-            $movie->video_file = $request->file('video_file')->store('movies/videos', 'public');
+            $movie->video_file = $this->uploadFile($request->file('video_file'), 'movies/videos');
         }
 
         $movie->save();
@@ -176,7 +230,7 @@ public function saveSettings(Request $request)
 
     public function updateMovie(Request $request, Movie $movie)
     {
-        $data = $request->validate([
+        $request->validate([
             'title'         => 'required|string|max:200',
             'genre'         => 'nullable|string|max:100',
             'year'          => 'nullable|digits:4',
@@ -193,28 +247,31 @@ public function saveSettings(Request $request)
         ]);
 
         $movie->fill([
-            'title'         => $data['title'],
-            'genre'         => $data['genre'] ?? null,
-            'year'          => $data['year'] ?? null,
-            'description'   => $data['description'] ?? null,
-            'rating'        => $data['rating'] ?? null,
-            'duration'      => $data['duration'] ?? null,
+            'title'         => $request->title,
+            'genre'         => $request->genre,
+            'year'          => $request->year,
+            'description'   => $request->description,
+            'rating'        => $request->rating,
+            'duration'      => $request->duration,
             'is_featured'   => $request->boolean('is_featured'),
-            'sort_order'    => $data['sort_order'] ?? 0,
-            'video_type'    => $data['video_type'],
-            'video_youtube' => $data['video_youtube'] ?? null,
+            'sort_order'    => $request->input('sort_order', 0),
+            'video_type'    => $request->video_type,
+            'video_youtube' => $request->video_youtube,
         ]);
 
-        foreach (['poster', 'banner'] as $img) {
-            if ($request->hasFile($img)) {
-                if ($movie->$img) Storage::disk('public')->delete($movie->$img);
-                $movie->$img = $request->file($img)->store("movies/{$img}", 'public');
-            }
+        if ($request->hasFile('poster')) {
+            $this->deleteFile($movie->poster);
+            $movie->poster = $this->uploadFile($request->file('poster'), 'movies/poster');
+        }
+
+        if ($request->hasFile('banner')) {
+            $this->deleteFile($movie->banner);
+            $movie->banner = $this->uploadFile($request->file('banner'), 'movies/banner');
         }
 
         if ($request->hasFile('video_file')) {
-            if ($movie->video_file) Storage::disk('public')->delete($movie->video_file);
-            $movie->video_file = $request->file('video_file')->store('movies/videos', 'public');
+            $this->deleteFile($movie->video_file);
+            $movie->video_file = $this->uploadFile($request->file('video_file'), 'movies/videos');
         }
 
         $movie->save();
@@ -223,20 +280,20 @@ public function saveSettings(Request $request)
 
     public function deleteMovie(Movie $movie)
     {
-        foreach (['poster', 'banner', 'video_file'] as $f) {
-            if ($movie->$f) Storage::disk('public')->delete($movie->$f);
-        }
+        $this->deleteFile($movie->poster);
+        $this->deleteFile($movie->banner);
+        $this->deleteFile($movie->video_file);
         $movie->delete();
         return back()->with('success', 'Movie deleted.');
     }
 
-    /* ──────────────────────────────────────────
-     *  CHARACTERS
-     * ────────────────────────────────────────── */
+    /* ══════════════════════════════════════
+       CHARACTERS
+    ══════════════════════════════════════ */
 
     public function storeCharacter(Request $request)
     {
-        $data = $request->validate([
+        $request->validate([
             'movie_id'   => 'nullable|exists:movies,id',
             'name'       => 'required|string|max:150',
             'actor_name' => 'nullable|string|max:150',
@@ -248,16 +305,16 @@ public function saveSettings(Request $request)
 
         $character = new Character();
         $character->fill([
-            'movie_id'   => $data['movie_id'] ?? null,
-            'name'       => $data['name'],
-            'actor_name' => $data['actor_name'] ?? null,
-            'role'       => $data['role'] ?? null,
-            'bio'        => $data['bio'] ?? null,
-            'sort_order' => $data['sort_order'] ?? 0,
+            'movie_id'   => $request->movie_id,
+            'name'       => $request->name,
+            'actor_name' => $request->actor_name,
+            'role'       => $request->role,
+            'bio'        => $request->bio,
+            'sort_order' => $request->input('sort_order', 0),
         ]);
 
         if ($request->hasFile('photo')) {
-            $character->photo = $request->file('photo')->store('characters', 'public');
+            $character->photo = $this->uploadFile($request->file('photo'), 'characters');
         }
 
         $character->save();
@@ -266,7 +323,7 @@ public function saveSettings(Request $request)
 
     public function updateCharacter(Request $request, Character $character)
     {
-        $data = $request->validate([
+        $request->validate([
             'movie_id'   => 'nullable|exists:movies,id',
             'name'       => 'required|string|max:150',
             'actor_name' => 'nullable|string|max:150',
@@ -277,17 +334,17 @@ public function saveSettings(Request $request)
         ]);
 
         $character->fill([
-            'movie_id'   => $data['movie_id'] ?? null,
-            'name'       => $data['name'],
-            'actor_name' => $data['actor_name'] ?? null,
-            'role'       => $data['role'] ?? null,
-            'bio'        => $data['bio'] ?? null,
-            'sort_order' => $data['sort_order'] ?? 0,
+            'movie_id'   => $request->movie_id,
+            'name'       => $request->name,
+            'actor_name' => $request->actor_name,
+            'role'       => $request->role,
+            'bio'        => $request->bio,
+            'sort_order' => $request->input('sort_order', 0),
         ]);
 
         if ($request->hasFile('photo')) {
-            if ($character->photo) Storage::disk('public')->delete($character->photo);
-            $character->photo = $request->file('photo')->store('characters', 'public');
+            $this->deleteFile($character->photo);
+            $character->photo = $this->uploadFile($request->file('photo'), 'characters');
         }
 
         $character->save();
@@ -296,43 +353,14 @@ public function saveSettings(Request $request)
 
     public function deleteCharacter(Character $character)
     {
-        if ($character->photo) Storage::disk('public')->delete($character->photo);
+        $this->deleteFile($character->photo);
         $character->delete();
         return back()->with('success', 'Character deleted.');
     }
 
-    /* ──────────────────────────────────────────
-     *  COUNTDOWN TIMER SETTINGS
-     * ────────────────────────────────────────── */
-
-    public function saveTimerSettings(Request $request)
-    {
-        $request->validate([
-            'timer_title'      => 'nullable|string|max:200',
-            'timer_subtitle'   => 'nullable|string|max:300',
-            'timer_date'       => 'nullable|date',
-            'timer_image'      => 'nullable|image|max:8192',
-            'timer_active'     => 'nullable|boolean',
-        ]);
-
-        $textFields = ['timer_title', 'timer_subtitle', 'timer_date'];
-        foreach ($textFields as $f) {
-            SiteSetting::set($f, $request->input($f, ''));
-        }
-        SiteSetting::set('timer_active', $request->boolean('timer_active') ? '1' : '0');
-
-        if ($request->hasFile('timer_image')) {
-            $old = SiteSetting::get('timer_image');
-            if ($old) Storage::disk('public')->delete($old);
-            SiteSetting::set('timer_image', $request->file('timer_image')->store('settings/timer', 'public'));
-        }
-
-        return back()->with('success', 'Countdown timer settings saved.');
-    }
-
-    /* ──────────────────────────────────────────
-     *  BANNERS
-     * ────────────────────────────────────────── */
+    /* ══════════════════════════════════════
+       BANNERS
+    ══════════════════════════════════════ */
 
     public function storeBanner(Request $request)
     {
@@ -344,14 +372,14 @@ public function saveSettings(Request $request)
             'image'      => 'nullable|image|max:8192',
         ]);
 
-        $banner = new \App\Models\Banner();
+        $banner             = new \App\Models\Banner();
         $banner->title      = $request->title;
         $banner->genre      = $request->genre;
         $banner->sort_order = $request->input('sort_order', 0);
         $banner->is_active  = $request->boolean('is_active', true);
 
         if ($request->hasFile('image')) {
-            $banner->image = $request->file('image')->store('banners', 'public');
+            $banner->image = $this->uploadFile($request->file('image'), 'banners');
         }
 
         $banner->save();
@@ -374,8 +402,8 @@ public function saveSettings(Request $request)
         $banner->is_active  = $request->boolean('is_active', true);
 
         if ($request->hasFile('image')) {
-            if ($banner->image) Storage::disk('public')->delete($banner->image);
-            $banner->image = $request->file('image')->store('banners', 'public');
+            $this->deleteFile($banner->image);
+            $banner->image = $this->uploadFile($request->file('image'), 'banners');
         }
 
         $banner->save();
@@ -384,7 +412,7 @@ public function saveSettings(Request $request)
 
     public function deleteBanner(\App\Models\Banner $banner)
     {
-        if ($banner->image) Storage::disk('public')->delete($banner->image);
+        $this->deleteFile($banner->image);
         $banner->delete();
         return back()->with('success', 'Banner deleted.');
     }

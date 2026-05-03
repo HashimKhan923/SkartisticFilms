@@ -1207,11 +1207,11 @@ textarea.cf-field { resize: none; }
 
         @elseif($ht === 'video_upload' && !empty($settings['hero_video_file']))
             <video autoplay muted loop playsinline preload="auto">
-                <source src="{{ Storage::url($settings['hero_video_file']) }}" type="video/mp4">
+                <source src="{{ $settings['hero_video_file']) }}" type="video/mp4">
             </video>
 
         @elseif(!empty($settings['hero_image']))
-            <img src="{{ Storage::url($settings['hero_image']) }}"
+            <img src="{{ $settings['hero_image']) }}"
                  alt="{{ $settings['site_name'] ?? 'SK Artistic Films' }}">
         @else
             <div style="width:100%;height:100%;background:linear-gradient(135deg,#090909 0%,#1a1208 100%);"></div>
@@ -1289,7 +1289,7 @@ textarea.cf-field { resize: none; }
 <section id="countdown-section">
     <div class="countdown-bg">
         @if(!empty($settings['timer_image']))
-            <img src="{{ Storage::url($settings['timer_image']) }}" alt="Countdown Banner">
+            <img src="{{ $settings['timer_image']) }}" alt="Countdown Banner">
         @else
             <div class="countdown-bg-fallback"></div>
         @endif
@@ -1362,7 +1362,7 @@ textarea.cf-field { resize: none; }
         <div class="nf-poster">
             @if($banner->image)
                 <img class="nf-poster-img"
-                     src="{{ Storage::url($banner->image) }}"
+                     src="{{ $banner->image) }}"
                      alt="{{ $banner->title }}"
                      loading="lazy">
             @else
@@ -1427,7 +1427,7 @@ textarea.cf-field { resize: none; }
                  class="film-poster-card">
 
                 @if($movie->poster)
-                    <img src="{{ Storage::url($movie->poster) }}"
+                    <img src="{{ $movie->poster) }}"
                          alt="{{ $movie->title }}"
                          loading="lazy"
                          style="width:100%;height:100%;object-fit:cover;display:block;transition:filter .3s;">
@@ -1473,7 +1473,7 @@ textarea.cf-field { resize: none; }
         <div class="about-grid">
             <div class="about-img-wrap" data-aos="fade-right">
                 @if(!empty($settings['about_image']))
-                    <img src="{{ Storage::url($settings['about_image']) }}" alt="About">
+                    <img src="{{ $settings['about_image']) }}" alt="About">
                 @else
                     <div style="width:100%;aspect-ratio:4/5;background:#1a1a1a;display:flex;align-items:center;justify-content:center;">
                         <i class="fas fa-camera" style="font-size:4rem;color:rgba(255,255,255,.04);"></i>
@@ -1533,7 +1533,7 @@ textarea.cf-field { resize: none; }
                 <div class="char-card">
                     <div class="char-photo">
                         @if($char->photo)
-                            <img src="{{ Storage::url($char->photo) }}" alt="{{ $char->name }}" loading="lazy">
+                            <img src="{{ $char->photo) }}" alt="{{ $char->name }}" loading="lazy">
                         @else
                             <div class="char-placeholder">{{ strtoupper(substr($char->name,0,1)) }}</div>
                         @endif
@@ -1570,7 +1570,7 @@ textarea.cf-field { resize: none; }
             @foreach($movies->take(5) as $i => $movie)
             <div class="project-tile" onclick="openNfModal({{ $movie->id }})">
                 @if($movie->banner ?? $movie->poster)
-                    <img src="{{ Storage::url($movie->banner ?? $movie->poster) }}" alt="{{ $movie->title }}" loading="lazy">
+                    <img src="{{ asset('uploads/' . ($movie->banner ?? $movie->poster)) }}" alt="{{ $movie->title }}" loading="lazy">
                 @else
                     <div style="width:100%;height:100%;background:#1a1a1a;min-height:180px;"></div>
                 @endif

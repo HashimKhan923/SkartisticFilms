@@ -1362,7 +1362,7 @@ textarea.cf-field { resize: none; }
         <div class="nf-poster">
             @if($banner->image)
                 <img class="nf-poster-img"
-                     src="{{ $banner->image) }}"
+                     src="{{  asset('uploads/' . $banner->image) }}"
                      alt="{{ $banner->title }}"
                      loading="lazy">
             @else
@@ -1427,7 +1427,7 @@ textarea.cf-field { resize: none; }
                  class="film-poster-card">
 
                 @if($movie->poster)
-                    <img src="{{ $movie->poster) }}"
+                    <img src="{{  asset('uploads/' . $movie->poster) }}"
                          alt="{{ $movie->title }}"
                          loading="lazy"
                          style="width:100%;height:100%;object-fit:cover;display:block;transition:filter .3s;">
@@ -1473,7 +1473,7 @@ textarea.cf-field { resize: none; }
         <div class="about-grid">
             <div class="about-img-wrap" data-aos="fade-right">
                 @if(!empty($settings['about_image']))
-                    <img src="{{ $settings['about_image']) }}" alt="About">
+                    <img src="{{  asset('uploads/' . $settings['about_image']) }}" alt="About">
                 @else
                     <div style="width:100%;aspect-ratio:4/5;background:#1a1a1a;display:flex;align-items:center;justify-content:center;">
                         <i class="fas fa-camera" style="font-size:4rem;color:rgba(255,255,255,.04);"></i>
@@ -1533,7 +1533,7 @@ textarea.cf-field { resize: none; }
                 <div class="char-card">
                     <div class="char-photo">
                         @if($char->photo)
-                            <img src="{{ $char->photo) }}" alt="{{ $char->name }}" loading="lazy">
+                            <img src="{{ asset('uploads/' . $char->photo) }}" alt="{{ $char->name }}" loading="lazy">
                         @else
                             <div class="char-placeholder">{{ strtoupper(substr($char->name,0,1)) }}</div>
                         @endif

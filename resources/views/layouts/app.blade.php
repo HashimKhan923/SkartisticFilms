@@ -575,7 +575,7 @@
         <a href="{{ route('home') }}" class="nav-logo">
             @if(!empty($settings['logo']))
                 <img class="nav-logo-img"
-                     src="{{ Storage::url($settings['logo']) }}"
+                     src="{{ asset('uploads/' . $settings['logo']) }}"
                      alt="{{ $settings['site_name'] ?? 'SK Artistic Films' }}">
             @else
                 <span class="nav-logo-wordmark">

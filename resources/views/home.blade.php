@@ -1207,11 +1207,11 @@ textarea.cf-field { resize: none; }
 
         @elseif($ht === 'video_upload' && !empty($settings['hero_video_file']))
             <video autoplay muted loop playsinline preload="auto">
-                <source src="{{ $settings['hero_video_file']) }}" type="video/mp4">
+                <source src="{{  asset('uploads/' . $settings['hero_video_file']) }}" type="video/mp4">
             </video>
 
         @elseif(!empty($settings['hero_image']))
-            <img src="{{ $settings['hero_image']) }}"
+            <img src="{{ asset('uploads/' . $settings['hero_image']) }}"
                  alt="{{ $settings['site_name'] ?? 'SK Artistic Films' }}">
         @else
             <div style="width:100%;height:100%;background:linear-gradient(135deg,#090909 0%,#1a1208 100%);"></div>

@@ -451,6 +451,9 @@
         <div class="sidebar-item" onclick="showTab('banners', this)">
             <i class="fas fa-th-large"></i> 6 Banners
         </div>
+        <div class="sidebar-item" onclick="showTab('pages', this)">
+            <i class="fas fa-file-alt"></i> Pages
+        </div>
     </aside>
 
     {{-- Main Content --}}
@@ -715,321 +718,451 @@
         </div>
 
         {{-- ═══════════ TIMER TAB ═══════════ --}}
-<div class="tab-pane" id="tab-timer">
-    <div class="page-header">
-        <h1 class="page-title">Countdown Timer</h1>
-    </div>
+        <div class="tab-pane" id="tab-timer">
+            <div class="page-header">
+                <h1 class="page-title">Countdown Timer</h1>
+            </div>
 
-    <form method="POST" action="{{ route('admin.timer.save') }}" enctype="multipart/form-data">
-        @csrf
-        <div class="form-section">
-            <div class="form-section-title"><i class="fas fa-clock"></i> Timer Settings</div>
+            <form method="POST" action="{{ route('admin.timer.save') }}" enctype="multipart/form-data">
+                @csrf
+                <div class="form-section">
+                    <div class="form-section-title"><i class="fas fa-clock"></i> Timer Settings</div>
 
-            <div class="form-grid">
-                <div class="form-group full">
-                    <label class="form-label">Enable Timer Section</label>
-                    <label class="toggle-label">
-                        <input type="checkbox" name="timer_active" value="1"
-                            {{ ($settings['timer_active'] ?? '0') === '1' ? 'checked' : '' }}>
-                        Show countdown section on homepage
-                    </label>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Timer Title</label>
-                    <input type="text" name="timer_title" class="form-control"
-                        value="{{ $settings['timer_title'] ?? '' }}"
-                        placeholder="e.g. New Release Coming Soon">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Countdown Date &amp; Time</label>
-                    <input type="datetime-local" name="timer_date" class="form-control"
-                        value="{{ $settings['timer_date'] ?? '' }}">
-                    <p class="form-hint">The timer counts down to this date.</p>
-                </div>
-                <div class="form-group full">
-                    <label class="form-label">Subtitle</label>
-                    <input type="text" name="timer_subtitle" class="form-control"
-                        value="{{ $settings['timer_subtitle'] ?? '' }}"
-                        placeholder="e.g. Mark your calendar — the wait is almost over">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Background Image</label>
-                    <div class="file-input-wrap">
-                        <label class="file-input-label">
-                            <i class="fas fa-image"></i>
-                            <span>{{ !empty($settings['timer_image']) ? basename($settings['timer_image']) : 'Choose image…' }}</span>
-                        </label>
-                        <input type="file" name="timer_image" accept="image/*"
-                            onchange="previewFile(this,'timer-img-preview','')">
+                    <div class="form-grid">
+                        <div class="form-group full">
+                            <label class="form-label">Enable Timer Section</label>
+                            <label class="toggle-label">
+                                <input type="checkbox" name="timer_active" value="1"
+                                    {{ ($settings['timer_active'] ?? '0') === '1' ? 'checked' : '' }}>
+                                Show countdown section on homepage
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Timer Title</label>
+                            <input type="text" name="timer_title" class="form-control"
+                                value="{{ $settings['timer_title'] ?? '' }}"
+                                placeholder="e.g. New Release Coming Soon">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Countdown Date &amp; Time</label>
+                            <input type="datetime-local" name="timer_date" class="form-control"
+                                value="{{ $settings['timer_date'] ?? '' }}">
+                            <p class="form-hint">The timer counts down to this date.</p>
+                        </div>
+                        <div class="form-group full">
+                            <label class="form-label">Subtitle</label>
+                            <input type="text" name="timer_subtitle" class="form-control"
+                                value="{{ $settings['timer_subtitle'] ?? '' }}"
+                                placeholder="e.g. Mark your calendar — the wait is almost over">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Background Image</label>
+                            <div class="file-input-wrap">
+                                <label class="file-input-label">
+                                    <i class="fas fa-image"></i>
+                                    <span>{{ !empty($settings['timer_image']) ? basename($settings['timer_image']) : 'Choose image…' }}</span>
+                                </label>
+                                <input type="file" name="timer_image" accept="image/*"
+                                    onchange="previewFile(this,'timer-img-preview','')">
+                            </div>
+                            @if(!empty($settings['timer_image']))
+                            <img src="{{ asset('uploads/' . $settings['timer_image']) }}" class="file-preview" id="timer-img-preview" style="max-width:200px;max-height:100px;margin-top:8px;">
+                            @endif
+                        </div>
                     </div>
-                    @if(!empty($settings['timer_image']))
-                    <img src="{{ asset('uploads/' . $settings['timer_image']) }}" class="file-preview" id="timer-img-preview" style="max-width:200px;max-height:100px;margin-top:8px;">
-                    @endif
                 </div>
+
+                <button type="submit" class="btn btn-gold">
+                    <i class="fas fa-save"></i> Save Timer Settings
+                </button>
+            </form>
+        </div>
+
+        {{-- ═══════════ BANNERS TAB ═══════════ --}}
+        <div class="tab-pane" id="tab-banners">
+            <div class="page-header">
+                <h1 class="page-title">6 Vertical Banners</h1>
+                <button class="btn btn-gold btn-sm" onclick="toggleAddForm('add-banner-form')">
+                    <i class="fas fa-plus"></i> Add Banner
+                </button>
+            </div>
+
+            <p style="font-size:12px;color:var(--muted);margin-bottom:20px;">
+                These 6 banners appear in the "Only on SK Artistic Films" section. Upload tall portrait images (2:3 ratio). Any empty slots auto-fill with movies.
+            </p>
+
+            {{-- Add Banner --}}
+            <div class="form-section" id="add-banner-form" style="display:none;">
+                <div class="form-section-title"><i class="fas fa-plus-circle"></i> Add New Banner</div>
+                <form method="POST" action="{{ route('admin.banners.store') }}" enctype="multipart/form-data">
+                    @csrf
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Title *</label>
+                            <input type="text" name="title" class="form-control" required placeholder="Film or series title">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Genre / Label</label>
+                            <input type="text" name="genre" class="form-control" placeholder="e.g. Drama, Action">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Sort Order</label>
+                            <input type="number" name="sort_order" class="form-control" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Active</label>
+                            <label class="toggle-label">
+                                <input type="checkbox" name="is_active" value="1" checked>
+                                Show this banner
+                            </label>
+                        </div>
+                        <div class="form-group full">
+                            <label class="form-label">Poster Image (2:3 portrait ratio recommended)</label>
+                            <div class="file-input-wrap">
+                                <label class="file-input-label">
+                                    <i class="fas fa-image"></i>
+                                    <span>Choose portrait image…</span>
+                                </label>
+                                <input type="file" name="image" accept="image/*">
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top:18px;">
+                        <button type="submit" class="btn btn-gold"><i class="fas fa-save"></i> Add Banner</button>
+                    </div>
+                </form>
+            </div>
+
+            {{-- Banner list --}}
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;">
+                @forelse($banners as $banner)
+                <div style="background:var(--dark2);border:1px solid var(--border);overflow:hidden;border-radius:2px;">
+                    @if($banner->image)
+                    <img src="{{ asset('uploads/' . $banner->image) }}"
+                        style="width:100%;aspect-ratio:2/3;object-fit:cover;display:block;">
+                    @else
+                    <div style="width:100%;aspect-ratio:2/3;background:var(--dark3);display:flex;align-items:center;justify-content:center;">
+                        <i class="fas fa-image" style="font-size:2rem;color:rgba(255,255,255,.08);"></i>
+                    </div>
+                    @endif
+
+                    <div style="padding:12px;">
+                        <p style="font-size:13px;font-weight:500;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $banner->title }}</p>
+                        @if($banner->genre)<p style="font-size:11px;color:var(--muted);margin-bottom:8px;">{{ $banner->genre }}</p>@endif
+
+                        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
+                            <button class="btn btn-outline btn-sm" onclick="toggleEditForm('edit-banner-{{ $banner->id }}')">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <form method="POST" action="{{ route('admin.banners.delete', $banner) }}"
+                                onsubmit="return confirm('Delete this banner?')" style="display:inline;">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
+                            </form>
+                        </div>
+
+                        <div class="edit-form" id="edit-banner-{{ $banner->id }}">
+                            <form method="POST" action="{{ route('admin.banners.update', $banner) }}" enctype="multipart/form-data">
+                                @csrf
+                                <div style="display:flex;flex-direction:column;gap:8px;">
+                                    <input type="text" name="title" class="form-control" value="{{ $banner->title }}" placeholder="Title" required>
+                                    <input type="text" name="genre" class="form-control" value="{{ $banner->genre }}" placeholder="Genre">
+                                    <input type="number" name="sort_order" class="form-control" value="{{ $banner->sort_order }}" placeholder="Order">
+                                    <label class="toggle-label" style="font-size:12px;">
+                                        <input type="checkbox" name="is_active" value="1" {{ $banner->is_active ? 'checked' : '' }}>
+                                        Active
+                                    </label>
+                                    <div class="file-input-wrap">
+                                        <label class="file-input-label" style="font-size:11px;">
+                                            <i class="fas fa-image"></i> New image
+                                        </label>
+                                        <input type="file" name="image" accept="image/*">
+                                    </div>
+                                    <button type="submit" class="btn btn-gold btn-sm"><i class="fas fa-save"></i> Update</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                @empty
+                <div style="grid-column:1/-1;text-align:center;padding:60px 0;color:var(--muted);">
+                    <i class="fas fa-th-large" style="font-size:2rem;display:block;margin-bottom:12px;"></i>
+                    No banners yet. Add up to 6 portrait banners.
+                </div>
+                @endforelse
             </div>
         </div>
 
-        <button type="submit" class="btn btn-gold">
-            <i class="fas fa-save"></i> Save Timer Settings
-        </button>
-    </form>
-</div>
+                {{-- ═══════════ MOVIES TAB ═══════════ --}}
+                <div class="tab-pane" id="tab-movies">
+                    <div class="page-header">
+                        <h1 class="page-title">Movies</h1>
+                        <button class="btn btn-gold btn-sm" onclick="toggleAddForm('add-movie-form')">
+                            <i class="fas fa-plus"></i> Add Movie
+                        </button>
+                    </div>
 
-{{-- ═══════════ BANNERS TAB ═══════════ --}}
-<div class="tab-pane" id="tab-banners">
+                    {{-- Add Movie Form --}}
+                    <div class="form-section" id="add-movie-form" style="display:none;">
+                        <div class="form-section-title"><i class="fas fa-plus-circle"></i> Add New Movie</div>
+                        <form method="POST" action="{{ route('admin.movies.store') }}" enctype="multipart/form-data">
+                            @csrf
+                            @include('admin._movie_form', ['movie' => null])
+                            <div style="margin-top:20px;">
+                                <button type="submit" class="btn btn-gold"><i class="fas fa-save"></i> Add Movie</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    {{-- Movie List --}}
+                    @forelse($movies as $movie)
+                    <div class="item-card">
+                        @if($movie->poster)
+                        <img src="{{ asset('uploads/' . $movie->poster) }}" class="item-thumb" alt="{{ $movie->title }}">
+                        @else
+                        <div class="item-thumb" style="display:flex;align-items:center;justify-content:center;">
+                            <i class="fas fa-film" style="color:rgba(255,255,255,.1);font-size:1.5rem;"></i>
+                        </div>
+                        @endif
+
+                        <div class="item-info">
+                            <div class="item-title">{{ $movie->title }}</div>
+                            <div class="item-meta">
+                                {{ $movie->year ?? '—' }}
+                                @if($movie->genre) · {{ $movie->genre }}@endif
+                                @if($movie->rating) · ⭐ {{ $movie->rating }}@endif
+                                @if($movie->is_featured) · <span style="color:var(--gold);">Featured</span>@endif
+                            </div>
+                            <div class="item-actions">
+                                <button class="btn btn-outline btn-sm" onclick="toggleEditForm('edit-movie-{{ $movie->id }}')">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <form method="POST" action="{{ route('admin.movies.delete', $movie) }}"
+                                    onsubmit="return confirm('Delete "{{ addslashes($movie->title) }}"?')" style="display:inline;">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Delete</button>
+                                </form>
+                            </div>
+
+                            {{-- Inline Edit --}}
+                            <div class="edit-form" id="edit-movie-{{ $movie->id }}">
+                                <form method="POST" action="{{ route('admin.movies.update', $movie) }}" enctype="multipart/form-data">
+                                    @csrf
+                                    @include('admin._movie_form', ['movie' => $movie])
+                                    <div style="margin-top:20px;">
+                                        <button type="submit" class="btn btn-gold btn-sm"><i class="fas fa-save"></i> Update</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    @empty
+                    <div style="text-align:center;padding:60px;color:var(--muted);">
+                        <i class="fas fa-film" style="font-size:2rem;margin-bottom:12px;display:block;"></i>
+                        No movies yet. Add your first film!
+                    </div>
+                    @endforelse
+                </div>
+
+                {{-- ═══════════ CHARACTERS TAB ═══════════ --}}
+                <div class="tab-pane" id="tab-characters">
+                    <div class="page-header">
+                        <h1 class="page-title">Characters</h1>
+                        <button class="btn btn-gold btn-sm" onclick="toggleAddForm('add-char-form')">
+                            <i class="fas fa-plus"></i> Add Character
+                        </button>
+                    </div>
+
+                    {{-- Add Character Form --}}
+                    <div class="form-section" id="add-char-form" style="display:none;">
+                        <div class="form-section-title"><i class="fas fa-user-plus"></i> Add New Character</div>
+                        <form method="POST" action="{{ route('admin.characters.store') }}" enctype="multipart/form-data">
+                            @csrf
+                            @include('admin._character_form', ['character' => null, 'movies' => $movies])
+                            <div style="margin-top:20px;">
+                                <button type="submit" class="btn btn-gold"><i class="fas fa-save"></i> Add Character</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    {{-- Character List --}}
+                    @forelse($characters as $char)
+                    <div class="item-card">
+                        @if($char->photo)
+                        <img src="{{ asset('uploads/' . $char->photo) }}" class="item-thumb" alt="{{ $char->name }}"
+                            style="aspect-ratio:3/4;width:72px;height:90px;object-position:top;">
+                        @else
+                        <div class="item-thumb" style="display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:rgba(255,255,255,.1);">
+                            {{ strtoupper(substr($char->name, 0, 1)) }}
+                        </div>
+                        @endif
+
+                        <div class="item-info">
+                            <div class="item-title">{{ $char->name }}</div>
+                            <div class="item-meta">
+                                @if($char->role){{ $char->role }}@endif
+                                @if($char->actor_name) · {{ $char->actor_name }}@endif
+                                @if($char->movie) · <span style="color:var(--gold);">{{ $char->movie->title }}</span>@endif
+                            </div>
+                            <div class="item-actions">
+                                <button class="btn btn-outline btn-sm" onclick="toggleEditForm('edit-char-{{ $char->id }}')">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <form method="POST" action="{{ route('admin.characters.delete', $char) }}"
+                                    onsubmit="return confirm('Delete {{ addslashes($char->name) }}?')" style="display:inline;">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Delete</button>
+                                </form>
+                            </div>
+
+                            <div class="edit-form" id="edit-char-{{ $char->id }}">
+                                <form method="POST" action="{{ route('admin.characters.update', $char) }}" enctype="multipart/form-data">
+                                    @csrf
+                                    @include('admin._character_form', ['character' => $char, 'movies' => $movies])
+                                    <div style="margin-top:20px;">
+                                        <button type="submit" class="btn btn-gold btn-sm"><i class="fas fa-save"></i> Update</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    @empty
+                    <div style="text-align:center;padding:60px;color:var(--muted);">
+                        <i class="fas fa-users" style="font-size:2rem;margin-bottom:12px;display:block;"></i>
+                        No characters yet.
+                    </div>
+                    @endforelse
+                </div>
+
+
+                {{-- ═══════════ PAGES TAB ═══════════ --}}
+<div class="tab-pane" id="tab-pages">
     <div class="page-header">
-        <h1 class="page-title">6 Vertical Banners</h1>
-        <button class="btn btn-gold btn-sm" onclick="toggleAddForm('add-banner-form')">
-            <i class="fas fa-plus"></i> Add Banner
+        <h1 class="page-title">Pages</h1>
+        <button class="btn btn-gold btn-sm" onclick="toggleAddForm('add-page-form')">
+            <i class="fas fa-plus"></i> Add Page
         </button>
     </div>
 
-    <p style="font-size:12px;color:var(--muted);margin-bottom:20px;">
-        These 6 banners appear in the "Only on SK Artistic Films" section. Upload tall portrait images (2:3 ratio). Any empty slots auto-fill with movies.
-    </p>
-
-    {{-- Add Banner --}}
-    <div class="form-section" id="add-banner-form" style="display:none;">
-        <div class="form-section-title"><i class="fas fa-plus-circle"></i> Add New Banner</div>
-        <form method="POST" action="{{ route('admin.banners.store') }}" enctype="multipart/form-data">
+    {{-- Add Page Form --}}
+    <div class="form-section" id="add-page-form" style="display:none;">
+        <div class="form-section-title"><i class="fas fa-plus-circle"></i> Add New Page</div>
+        <form method="POST" action="{{ route('admin.pages.store') }}">
             @csrf
             <div class="form-grid">
                 <div class="form-group">
-                    <label class="form-label">Title *</label>
-                    <input type="text" name="title" class="form-control" required placeholder="Film or series title">
+                    <label class="form-label">Page Title *</label>
+                    <input type="text" name="title" class="form-control"
+                           placeholder="e.g. Privacy Policy" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Genre / Label</label>
-                    <input type="text" name="genre" class="form-control" placeholder="e.g. Drama, Action">
+                    <label class="form-label">URL Slug *</label>
+                    <input type="text" name="slug" class="form-control"
+                           placeholder="e.g. privacy-policy" required>
+                    <p class="form-hint">URL: {{ url('/page/') }}/<strong>slug</strong></p>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Sort Order</label>
-                    <input type="number" name="sort_order" class="form-control" value="0">
-                </div>
-                <div class="form-group">
+                <div class="form-group full">
                     <label class="form-label">Active</label>
                     <label class="toggle-label">
                         <input type="checkbox" name="is_active" value="1" checked>
-                        Show this banner
+                        Show this page publicly
                     </label>
                 </div>
                 <div class="form-group full">
-                    <label class="form-label">Poster Image (2:3 portrait ratio recommended)</label>
-                    <div class="file-input-wrap">
-                        <label class="file-input-label">
-                            <i class="fas fa-image"></i>
-                            <span>Choose portrait image…</span>
-                        </label>
-                        <input type="file" name="image" accept="image/*">
-                    </div>
+                    <label class="form-label">Content *</label>
+                    <textarea name="content" class="form-control" rows="16"
+                              placeholder="Write your page content here. You can use basic HTML tags like &lt;h2&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;strong&gt; etc."
+                              required></textarea>
+                    <p class="form-hint">Supports HTML. Use &lt;h2&gt; for headings, &lt;h3&gt; for subheadings, &lt;p&gt; for paragraphs, &lt;ul&gt;&lt;li&gt; for lists.</p>
                 </div>
             </div>
             <div style="margin-top:18px;">
-                <button type="submit" class="btn btn-gold"><i class="fas fa-save"></i> Add Banner</button>
+                <button type="submit" class="btn btn-gold">
+                    <i class="fas fa-save"></i> Create Page
+                </button>
             </div>
         </form>
     </div>
 
-    {{-- Banner list --}}
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;">
-        @forelse($banners as $banner)
-        <div style="background:var(--dark2);border:1px solid var(--border);overflow:hidden;border-radius:2px;">
-            @if($banner->image)
-            <img src="{{ asset('uploads/' . $banner->image) }}"
-                 style="width:100%;aspect-ratio:2/3;object-fit:cover;display:block;">
-            @else
-            <div style="width:100%;aspect-ratio:2/3;background:var(--dark3);display:flex;align-items:center;justify-content:center;">
-                <i class="fas fa-image" style="font-size:2rem;color:rgba(255,255,255,.08);"></i>
+    {{-- Pages List --}}
+    @php $pages = \App\Models\Page::orderBy('created_at')->get(); @endphp
+
+    @forelse($pages as $page)
+    <div class="item-card">
+        <div class="item-info">
+            <div class="item-title">{{ $page->title }}</div>
+            <div class="item-meta">
+                <span>{{ url('/page/' . $page->slug) }}</span>
+                @if($page->is_active)
+                    <span style="color:#4ade80;">● Active</span>
+                @else
+                    <span style="color:#f87171;">● Inactive</span>
+                @endif
             </div>
-            @endif
-
-            <div style="padding:12px;">
-                <p style="font-size:13px;font-weight:500;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $banner->title }}</p>
-                @if($banner->genre)<p style="font-size:11px;color:var(--muted);margin-bottom:8px;">{{ $banner->genre }}</p>@endif
-
-                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
-                    <button class="btn btn-outline btn-sm" onclick="toggleEditForm('edit-banner-{{ $banner->id }}')">
-                        <i class="fas fa-edit"></i> Edit
+            <div class="item-actions">
+                <a href="{{ route('page', $page->slug) }}" target="_blank"
+                   class="btn btn-outline btn-sm">
+                    <i class="fas fa-eye"></i> View
+                </a>
+                <button class="btn btn-outline btn-sm"
+                        onclick="toggleEditForm('edit-page-{{ $page->id }}')">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+                <form method="POST" action="{{ route('admin.pages.delete', $page) }}"
+                      onsubmit="return confirm('Delete \'{{ addslashes($page->title) }}\'?')"
+                      style="display:inline;">
+                    @csrf @method('DELETE')
+                    <button type="submit" class="btn btn-danger btn-sm">
+                        <i class="fas fa-trash"></i> Delete
                     </button>
-                    <form method="POST" action="{{ route('admin.banners.delete', $banner) }}"
-                        onsubmit="return confirm('Delete this banner?')" style="display:inline;">
-                        @csrf @method('DELETE')
-                        <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
-                    </form>
-                </div>
+                </form>
+            </div>
 
-                <div class="edit-form" id="edit-banner-{{ $banner->id }}">
-                    <form method="POST" action="{{ route('admin.banners.update', $banner) }}" enctype="multipart/form-data">
-                        @csrf
-                        <div style="display:flex;flex-direction:column;gap:8px;">
-                            <input type="text" name="title" class="form-control" value="{{ $banner->title }}" placeholder="Title" required>
-                            <input type="text" name="genre" class="form-control" value="{{ $banner->genre }}" placeholder="Genre">
-                            <input type="number" name="sort_order" class="form-control" value="{{ $banner->sort_order }}" placeholder="Order">
-                            <label class="toggle-label" style="font-size:12px;">
-                                <input type="checkbox" name="is_active" value="1" {{ $banner->is_active ? 'checked' : '' }}>
+            {{-- Edit Form --}}
+            <div class="edit-form" id="edit-page-{{ $page->id }}">
+                <form method="POST" action="{{ route('admin.pages.update', $page) }}">
+                    @csrf
+                    <div class="form-grid" style="margin-top:16px;">
+                        <div class="form-group">
+                            <label class="form-label">Title *</label>
+                            <input type="text" name="title" class="form-control"
+                                   value="{{ $page->title }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Slug *</label>
+                            <input type="text" name="slug" class="form-control"
+                                   value="{{ $page->slug }}" required>
+                            <p class="form-hint">{{ url('/page/' . $page->slug) }}</p>
+                        </div>
+                        <div class="form-group full">
+                            <label class="toggle-label">
+                                <input type="checkbox" name="is_active" value="1"
+                                    {{ $page->is_active ? 'checked' : '' }}>
                                 Active
                             </label>
-                            <div class="file-input-wrap">
-                                <label class="file-input-label" style="font-size:11px;">
-                                    <i class="fas fa-image"></i> New image
-                                </label>
-                                <input type="file" name="image" accept="image/*">
-                            </div>
-                            <button type="submit" class="btn btn-gold btn-sm"><i class="fas fa-save"></i> Update</button>
                         </div>
-                    </form>
-                </div>
+                        <div class="form-group full">
+                            <label class="form-label">Content *</label>
+                            <textarea name="content" class="form-control"
+                                      rows="16" required>{{ $page->content }}</textarea>
+                        </div>
+                    </div>
+                    <div style="margin-top:16px;">
+                        <button type="submit" class="btn btn-gold btn-sm">
+                            <i class="fas fa-save"></i> Update Page
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
-        @empty
-        <div style="grid-column:1/-1;text-align:center;padding:60px 0;color:var(--muted);">
-            <i class="fas fa-th-large" style="font-size:2rem;display:block;margin-bottom:12px;"></i>
-            No banners yet. Add up to 6 portrait banners.
-        </div>
-        @endforelse
     </div>
+    @empty
+    <div style="text-align:center;padding:60px;color:var(--muted);">
+        <i class="fas fa-file-alt" style="font-size:2rem;display:block;margin-bottom:12px;"></i>
+        No pages yet.
+    </div>
+    @endforelse
 </div>
-
-        {{-- ═══════════ MOVIES TAB ═══════════ --}}
-        <div class="tab-pane" id="tab-movies">
-            <div class="page-header">
-                <h1 class="page-title">Movies</h1>
-                <button class="btn btn-gold btn-sm" onclick="toggleAddForm('add-movie-form')">
-                    <i class="fas fa-plus"></i> Add Movie
-                </button>
-            </div>
-
-            {{-- Add Movie Form --}}
-            <div class="form-section" id="add-movie-form" style="display:none;">
-                <div class="form-section-title"><i class="fas fa-plus-circle"></i> Add New Movie</div>
-                <form method="POST" action="{{ route('admin.movies.store') }}" enctype="multipart/form-data">
-                    @csrf
-                    @include('admin._movie_form', ['movie' => null])
-                    <div style="margin-top:20px;">
-                        <button type="submit" class="btn btn-gold"><i class="fas fa-save"></i> Add Movie</button>
-                    </div>
-                </form>
-            </div>
-
-            {{-- Movie List --}}
-            @forelse($movies as $movie)
-            <div class="item-card">
-                @if($movie->poster)
-                <img src="{{ asset('uploads/' . $movie->poster) }}" class="item-thumb" alt="{{ $movie->title }}">
-                @else
-                <div class="item-thumb" style="display:flex;align-items:center;justify-content:center;">
-                    <i class="fas fa-film" style="color:rgba(255,255,255,.1);font-size:1.5rem;"></i>
-                </div>
-                @endif
-
-                <div class="item-info">
-                    <div class="item-title">{{ $movie->title }}</div>
-                    <div class="item-meta">
-                        {{ $movie->year ?? '—' }}
-                        @if($movie->genre) · {{ $movie->genre }}@endif
-                        @if($movie->rating) · ⭐ {{ $movie->rating }}@endif
-                        @if($movie->is_featured) · <span style="color:var(--gold);">Featured</span>@endif
-                    </div>
-                    <div class="item-actions">
-                        <button class="btn btn-outline btn-sm" onclick="toggleEditForm('edit-movie-{{ $movie->id }}')">
-                            <i class="fas fa-edit"></i> Edit
-                        </button>
-                        <form method="POST" action="{{ route('admin.movies.delete', $movie) }}"
-                            onsubmit="return confirm('Delete "{{ addslashes($movie->title) }}"?')" style="display:inline;">
-                            @csrf @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Delete</button>
-                        </form>
-                    </div>
-
-                    {{-- Inline Edit --}}
-                    <div class="edit-form" id="edit-movie-{{ $movie->id }}">
-                        <form method="POST" action="{{ route('admin.movies.update', $movie) }}" enctype="multipart/form-data">
-                            @csrf
-                            @include('admin._movie_form', ['movie' => $movie])
-                            <div style="margin-top:20px;">
-                                <button type="submit" class="btn btn-gold btn-sm"><i class="fas fa-save"></i> Update</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            @empty
-            <div style="text-align:center;padding:60px;color:var(--muted);">
-                <i class="fas fa-film" style="font-size:2rem;margin-bottom:12px;display:block;"></i>
-                No movies yet. Add your first film!
-            </div>
-            @endforelse
-        </div>
-
-        {{-- ═══════════ CHARACTERS TAB ═══════════ --}}
-        <div class="tab-pane" id="tab-characters">
-            <div class="page-header">
-                <h1 class="page-title">Characters</h1>
-                <button class="btn btn-gold btn-sm" onclick="toggleAddForm('add-char-form')">
-                    <i class="fas fa-plus"></i> Add Character
-                </button>
-            </div>
-
-            {{-- Add Character Form --}}
-            <div class="form-section" id="add-char-form" style="display:none;">
-                <div class="form-section-title"><i class="fas fa-user-plus"></i> Add New Character</div>
-                <form method="POST" action="{{ route('admin.characters.store') }}" enctype="multipart/form-data">
-                    @csrf
-                    @include('admin._character_form', ['character' => null, 'movies' => $movies])
-                    <div style="margin-top:20px;">
-                        <button type="submit" class="btn btn-gold"><i class="fas fa-save"></i> Add Character</button>
-                    </div>
-                </form>
-            </div>
-
-            {{-- Character List --}}
-            @forelse($characters as $char)
-            <div class="item-card">
-                @if($char->photo)
-                <img src="{{ asset('uploads/' . $char->photo) }}" class="item-thumb" alt="{{ $char->name }}"
-                    style="aspect-ratio:3/4;width:72px;height:90px;object-position:top;">
-                @else
-                <div class="item-thumb" style="display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:rgba(255,255,255,.1);">
-                    {{ strtoupper(substr($char->name, 0, 1)) }}
-                </div>
-                @endif
-
-                <div class="item-info">
-                    <div class="item-title">{{ $char->name }}</div>
-                    <div class="item-meta">
-                        @if($char->role){{ $char->role }}@endif
-                        @if($char->actor_name) · {{ $char->actor_name }}@endif
-                        @if($char->movie) · <span style="color:var(--gold);">{{ $char->movie->title }}</span>@endif
-                    </div>
-                    <div class="item-actions">
-                        <button class="btn btn-outline btn-sm" onclick="toggleEditForm('edit-char-{{ $char->id }}')">
-                            <i class="fas fa-edit"></i> Edit
-                        </button>
-                        <form method="POST" action="{{ route('admin.characters.delete', $char) }}"
-                            onsubmit="return confirm('Delete {{ addslashes($char->name) }}?')" style="display:inline;">
-                            @csrf @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Delete</button>
-                        </form>
-                    </div>
-
-                    <div class="edit-form" id="edit-char-{{ $char->id }}">
-                        <form method="POST" action="{{ route('admin.characters.update', $char) }}" enctype="multipart/form-data">
-                            @csrf
-                            @include('admin._character_form', ['character' => $char, 'movies' => $movies])
-                            <div style="margin-top:20px;">
-                                <button type="submit" class="btn btn-gold btn-sm"><i class="fas fa-save"></i> Update</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            @empty
-            <div style="text-align:center;padding:60px;color:var(--muted);">
-                <i class="fas fa-users" style="font-size:2rem;margin-bottom:12px;display:block;"></i>
-                No characters yet.
-            </div>
-            @endforelse
-        </div>
 
     </main>
 </div>

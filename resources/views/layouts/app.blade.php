@@ -231,13 +231,13 @@
             gap: 5px;
         }
 
-        .nav-dropdown > a::after {
+        /* .nav-dropdown > a::after {
             content: '';
             border: 4px solid transparent;
             border-top-color: currentColor;
-            margin-top: 3px;
+            margin-top: 3px; !important;
             transition: transform .2s;
-        }
+        } */
 
         .nav-dropdown:hover > a::after { transform: rotate(180deg); margin-top: -2px; }
 
@@ -605,7 +605,7 @@
         {{-- Right side icons --}}
         <div class="nav-right" id="navRight">
 
-            {{-- Search --}}
+            <!-- {{-- Search --}}
             <div class="nav-search-wrap" id="navSearchWrap">
                 <input type="text" class="nav-search-input" id="navSearchInput" placeholder="Search films, cast…">
                 <button class="nav-search-btn" id="navSearchBtn" aria-label="Search">
@@ -617,7 +617,9 @@
             <button class="nav-icon-btn nav-bell" aria-label="Notifications">
                 <i class="fas fa-bell" style="font-size:17px;"></i>
                 <span class="nav-bell-dot"></span>
-            </button>
+            </button> -->
+
+            Watch trailer on <img src="{{ asset('youtubeicon.jpg') }}" alt="YouTube" width="40" style="margin-top:8px; margin-right:5px">
 
             {{-- Profile / Admin quick access --}}
             <div class="nav-profile">
@@ -733,11 +735,25 @@
                 {{ $settings['footer_text'] ?? '© '.date('Y').' SK Artistic Films. All Rights Reserved.' }}
             </p>
             <div style="display:flex;gap:20px;">
-                <span style="font-size:12px;color:rgba(255,255,255,.2);">Privacy Policy</span>
-                <span style="font-size:12px;color:rgba(255,255,255,.2);">Terms of Use</span>
-                <a href="{{ route('admin.login') }}" style="font-size:12px;color:rgba(255,255,255,.12);transition:color .2s;"
-                   onmouseover="this.style.color='rgba(255,255,255,.4)'"
-                   onmouseout="this.style.color='rgba(255,255,255,.12)'">Admin</a>
+    <a href="{{ route('page', 'privacy-policy') }}"
+       style="font-size:12px;color:rgba(255,255,255,.3);transition:color .2s;"
+       onmouseover="this.style.color='rgba(255,255,255,.6)'"
+       onmouseout="this.style.color='rgba(255,255,255,.3)'">
+       Privacy Policy
+    </a>
+    <a href="{{ route('page', 'terms-of-use') }}"
+       style="font-size:12px;color:rgba(255,255,255,.3);transition:color .2s;"
+       onmouseover="this.style.color='rgba(255,255,255,.6)'"
+       onmouseout="this.style.color='rgba(255,255,255,.3)'">
+       Terms of Use
+    </a>
+    <a href="{{ route('admin.login') }}"
+       style="font-size:12px;color:rgba(255,255,255,.12);transition:color .2s;"
+       onmouseover="this.style.color='rgba(255,255,255,.3)'"
+       onmouseout="this.style.color='rgba(255,255,255,.12)'">
+       Admin
+    </a>
+
             </div>
         </div>
     </div>

@@ -89,7 +89,6 @@ private function deleteFile(?string $path): void
 
     public function saveSettings(Request $request)
     {
-        return $request;
         $request->validate([
             'site_name'       => 'required|string|max:100',
             'site_tagline'    => 'nullable|string|max:200',
@@ -416,5 +415,51 @@ private function deleteFile(?string $path): void
         $this->deleteFile($banner->image);
         $banner->delete();
         return back()->with('success', 'Banner deleted.');
+    }
+
+
+
+        public function storePage(Request $request)
+    {
+        $request->validate([
+            'slug'      => 'required|string|max:100|unique:pages,slug|alpha_dash',
+            'title'     => 'required|string|max:200',
+            'content'   => 'required|string',
+            'is_active' => 'nullable|boolean',
+        ]);
+
+        \App\Models\Page::create([
+            'slug'      => $request->slug,
+            'title'     => $request->title,
+            'content'   => $request->content,
+            'is_active' => $request->boolean('is_active', true),
+        ]);
+
+        return back()->with('success', "Page \"{$request->title}\" created.");
+    }
+
+    public function updatePage(Request $request, \App\Models\Page $page)
+    {
+        $request->validate([
+            'slug'      => 'required|string|max:100|alpha_dash|unique:pages,slug,' . $page->id,
+            'title'     => 'required|string|max:200',
+            'content'   => 'required|string',
+            'is_active' => 'nullable|boolean',
+        ]);
+
+        $page->update([
+            'slug'      => $request->slug,
+            'title'     => $request->title,
+            'content'   => $request->content,
+            'is_active' => $request->boolean('is_active', true),
+        ]);
+
+        return back()->with('success', "Page \"{$page->title}\" updated.");
+    }
+
+    public function deletePage(\App\Models\Page $page)
+    {
+        $page->delete();
+        return back()->with('success', 'Page deleted.');
     }
 }

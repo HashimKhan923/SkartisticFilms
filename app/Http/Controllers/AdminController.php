@@ -387,7 +387,8 @@ private function deleteFile(?string $path): void
     }
 
     public function updateBanner(Request $request, \App\Models\Banner $banner)
-    {
+    { 
+        return 1;
         $request->validate([
             'title'      => 'required|string|max:200',
             'genre'      => 'nullable|string|max:100',

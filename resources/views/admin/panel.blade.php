@@ -707,8 +707,7 @@
                     <input type="hidden" name="instagram"   value="{{ $settings['instagram'] ?? '' }}">
                     <input type="hidden" name="youtube"     value="{{ $settings['youtube'] ?? '' }}">
                     <input type="hidden" name="footer_text" value="{{ $settings['footer_text'] ?? '' }}">
-                    <input type="hidden" name="hero_title"    value="{{ $settings['hero_title'] ?? '' }}">
-                    <input type="hidden" name="hero_subtitle" value="{{ $settings['hero_subtitle'] ?? '' }}">
+
                 </div>
 
                 <button type="submit" class="btn btn-gold">

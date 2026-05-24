@@ -35,5 +35,13 @@ Route::prefix('sk-admin')->name('admin.')->group(function () {
         Route::post('/pages',           [AdminController::class, 'storePage'])->name('pages.store');
         Route::post('/pages/{page}',    [AdminController::class, 'updatePage'])->name('pages.update');
         Route::delete('/pages/{page}',  [AdminController::class, 'deletePage'])->name('pages.delete');
+
+        Route::post('/reviews',              [AdminController::class, 'storeReview'])->name('reviews.store');
+        Route::post('/reviews/{review}',     [AdminController::class, 'updateReview'])->name('reviews.update');
+        Route::delete('/reviews/{review}',   [AdminController::class, 'deleteReview'])->name('reviews.delete');
+
+        Route::post('/software',               [AdminController::class, 'storeSoftware'])->name('software.store');
+        Route::post('/software/{software}',    [AdminController::class, 'updateSoftware'])->name('software.update');
+        Route::delete('/software/{software}',  [AdminController::class, 'deleteSoftware'])->name('software.delete');
     });
 });

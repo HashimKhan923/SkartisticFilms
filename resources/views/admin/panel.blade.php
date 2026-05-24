@@ -454,6 +454,12 @@
         <div class="sidebar-item" onclick="showTab('pages', this)">
             <i class="fas fa-file-alt"></i> Pages
         </div>
+        <div class="sidebar-item" onclick="showTab('reviews', this)">
+            <i class="fas fa-star"></i> Reviews
+        </div>
+        <div class="sidebar-item" onclick="showTab('software', this)">
+            <i class="fas fa-tools"></i> Software
+        </div>
     </aside>
 
     {{-- Main Content --}}
@@ -1162,6 +1168,326 @@
     </div>
     @endforelse
 </div>
+
+        {{-- ═══════════ SOFTWARE TAB ═══════════ --}}
+        <div class="tab-pane" id="tab-software">
+            <div class="page-header">
+                <h1 class="page-title">Software We Use</h1>
+                <button class="btn btn-gold btn-sm" onclick="toggleAddForm('add-software-form')">
+                    <i class="fas fa-plus"></i> Add Software
+                </button>
+            </div>
+
+            {{-- Add Software Form --}}
+            <div class="form-section" id="add-software-form" style="display:none;">
+                <div class="form-section-title"><i class="fas fa-plus-circle"></i> Add New Software</div>
+                <form method="POST" action="{{ route('admin.software.store') }}" enctype="multipart/form-data">
+                    @csrf
+                    <div class="form-grid cols-3">
+                        <div class="form-group">
+                            <label class="form-label">Name *</label>
+                            <input type="text" name="name" class="form-control" required placeholder="e.g. Adobe Premiere Pro">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Role / Purpose</label>
+                            <input type="text" name="role" class="form-control" placeholder="e.g. Video Editing">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Image Width (px)</label>
+                            <input type="number" name="width" class="form-control" value="48" min="16" max="300">
+                            <p class="form-hint">Display width of the logo image in pixels</p>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Sort Order</label>
+                            <input type="number" name="sort_order" class="form-control" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Active</label>
+                            <label class="toggle-label">
+                                <input type="checkbox" name="is_active" value="1" checked>
+                                Show on site
+                            </label>
+                        </div>
+                        <div class="form-group full">
+                            <label class="form-label">Logo / Image</label>
+                            <div class="file-input-wrap">
+                                <label class="file-input-label">
+                                    <i class="fas fa-image"></i>
+                                    <span>Choose image…</span>
+                                </label>
+                                <input type="file" name="image" accept="image/*">
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top:18px;">
+                        <button type="submit" class="btn btn-gold"><i class="fas fa-save"></i> Add Software</button>
+                    </div>
+                </form>
+            </div>
+
+            {{-- Software List --}}
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;">
+                @forelse($software as $sw)
+                <div style="background:var(--dark2);border:1px solid var(--border);padding:20px;border-radius:2px;">
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                        <div style="width:56px;height:56px;background:var(--dark3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;">
+                            @if($sw->image)
+                                <img src="{{ asset('uploads/' . $sw->image) }}"
+                                     style="width:{{ $sw->width }}px;height:auto;object-fit:contain;"
+                                     alt="{{ $sw->name }}">
+                            @else
+                                <i class="fas fa-tools" style="color:var(--muted);"></i>
+                            @endif
+                        </div>
+                        <div style="min-width:0;">
+                            <p style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $sw->name }}</p>
+                            @if($sw->role)<p style="font-size:11px;color:var(--muted);">{{ $sw->role }}</p>@endif
+                            <p style="font-size:10px;color:var(--muted);">{{ $sw->width }}px</p>
+                            @if(!$sw->is_active)<p style="font-size:10px;color:#f87171;">Inactive</p>@endif
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:6px;">
+                        <button class="btn btn-outline btn-sm" onclick="toggleEditForm('edit-sw-{{ $sw->id }}')">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <form method="POST" action="{{ route('admin.software.delete', $sw) }}"
+                            onsubmit="return confirm('Delete {{ addslashes($sw->name) }}?')" style="display:inline;">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
+                        </form>
+                    </div>
+
+                    <div class="edit-form" id="edit-sw-{{ $sw->id }}">
+                        <form method="POST" action="{{ route('admin.software.update', $sw) }}" enctype="multipart/form-data">
+                            @csrf
+                            <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;">
+                                <input type="text" name="name" class="form-control" value="{{ $sw->name }}" placeholder="Name" required>
+                                <input type="text" name="role" class="form-control" value="{{ $sw->role }}" placeholder="Role / Purpose">
+                                <input type="number" name="width" class="form-control" value="{{ $sw->width }}" placeholder="Width (px)" min="16" max="300">
+                                <input type="number" name="sort_order" class="form-control" value="{{ $sw->sort_order }}" placeholder="Sort Order">
+                                <label class="toggle-label" style="font-size:12px;">
+                                    <input type="checkbox" name="is_active" value="1" {{ $sw->is_active ? 'checked' : '' }}>
+                                    Active
+                                </label>
+                                <div class="file-input-wrap">
+                                    <label class="file-input-label" style="font-size:11px;">
+                                        <i class="fas fa-image"></i>
+                                        {{ $sw->image ? basename($sw->image) : 'Replace image…' }}
+                                    </label>
+                                    <input type="file" name="image" accept="image/*">
+                                </div>
+                                <button type="submit" class="btn btn-gold btn-sm"><i class="fas fa-save"></i> Update</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                @empty
+                <div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--muted);">
+                    <i class="fas fa-tools" style="font-size:2rem;display:block;margin-bottom:12px;"></i>
+                    No software yet. Add your first tool!
+                </div>
+                @endforelse
+            </div>
+        </div>
+
+        {{-- ═══════════ REVIEWS TAB ═══════════ --}}
+        <div class="tab-pane" id="tab-reviews">
+            <div class="page-header">
+                <h1 class="page-title">Reviews</h1>
+                <button class="btn btn-gold btn-sm" onclick="toggleAddForm('add-review-form')">
+                    <i class="fas fa-plus"></i> Add Review
+                </button>
+            </div>
+
+            {{-- Add Review Form --}}
+            <div class="form-section" id="add-review-form" style="display:none;">
+                <div class="form-section-title"><i class="fas fa-plus-circle"></i> Add New Review</div>
+                <form method="POST" action="{{ route('admin.reviews.store') }}" enctype="multipart/form-data">
+                    @csrf
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Reviewer Name *</label>
+                            <input type="text" name="reviewer_name" class="form-control" required placeholder="e.g. John Smith">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Title / Role</label>
+                            <input type="text" name="reviewer_title" class="form-control" placeholder="e.g. Film Critic, Director">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Rating (1–5)</label>
+                            <select name="rating" class="form-control">
+                                <option value="">— No rating —</option>
+                                @for($i = 5; $i >= 1; $i--)
+                                <option value="{{ $i }}">{{ $i }} star{{ $i > 1 ? 's' : '' }}</option>
+                                @endfor
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Related Movie</label>
+                            <select name="movie_id" class="form-control">
+                                <option value="">— General / No movie —</option>
+                                @foreach($movies as $movie)
+                                <option value="{{ $movie->id }}">{{ $movie->title }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Sort Order</label>
+                            <input type="number" name="sort_order" class="form-control" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Active</label>
+                            <label class="toggle-label">
+                                <input type="checkbox" name="is_active" value="1" checked>
+                                Show this review publicly
+                            </label>
+                        </div>
+                        <div class="form-group full">
+                            <label class="form-label">Review Text *</label>
+                            <textarea name="body" class="form-control" rows="5" required placeholder="Write the review here…"></textarea>
+                        </div>
+                        <div class="form-group full">
+                            <label class="form-label">Reviewer Photo</label>
+                            <div class="file-input-wrap">
+                                <label class="file-input-label">
+                                    <i class="fas fa-user-circle"></i>
+                                    <span>Choose photo…</span>
+                                </label>
+                                <input type="file" name="photo" accept="image/*">
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top:18px;">
+                        <button type="submit" class="btn btn-gold"><i class="fas fa-save"></i> Add Review</button>
+                    </div>
+                </form>
+            </div>
+
+            {{-- Reviews List --}}
+            @forelse($reviews as $review)
+            <div class="item-card">
+                @if($review->photo)
+                <img src="{{ asset('uploads/' . $review->photo) }}" class="item-thumb"
+                    style="border-radius:50%;width:60px;height:60px;object-fit:cover;object-position:top;">
+                @else
+                <div class="item-thumb"
+                    style="width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:rgba(255,255,255,.15);">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                @endif
+
+                <div class="item-info">
+                    <div class="item-title">{{ $review->reviewer_name }}</div>
+                    <div class="item-meta">
+                        @if($review->reviewer_title){{ $review->reviewer_title }}@endif
+                        @if($review->rating)
+                            &nbsp;·&nbsp;
+                            @for($i = 1; $i <= 5; $i++)
+                                <span style="color:{{ $i <= $review->rating ? '#c9a84c' : 'rgba(255,255,255,.15)' }};">★</span>
+                            @endfor
+                        @endif
+                        @if($review->movie)
+                            &nbsp;·&nbsp;<span style="color:var(--gold);">{{ $review->movie->title }}</span>
+                        @endif
+                        @if(!$review->is_active)
+                            &nbsp;·&nbsp;<span style="color:#f87171;">Inactive</span>
+                        @endif
+                    </div>
+                    <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5;">
+                        {{ Str::limit($review->body, 160) }}
+                    </p>
+                    <div class="item-actions">
+                        <button class="btn btn-outline btn-sm" onclick="toggleEditForm('edit-review-{{ $review->id }}')">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <form method="POST" action="{{ route('admin.reviews.delete', $review) }}"
+                            onsubmit="return confirm('Delete review by {{ addslashes($review->reviewer_name) }}?')" style="display:inline;">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Delete</button>
+                        </form>
+                    </div>
+
+                    {{-- Inline Edit Form --}}
+                    <div class="edit-form" id="edit-review-{{ $review->id }}">
+                        <form method="POST" action="{{ route('admin.reviews.update', $review) }}" enctype="multipart/form-data">
+                            @csrf
+                            <div class="form-grid" style="margin-top:16px;">
+                                <div class="form-group">
+                                    <label class="form-label">Reviewer Name *</label>
+                                    <input type="text" name="reviewer_name" class="form-control"
+                                        value="{{ $review->reviewer_name }}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Title / Role</label>
+                                    <input type="text" name="reviewer_title" class="form-control"
+                                        value="{{ $review->reviewer_title }}">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Rating (1–5)</label>
+                                    <select name="rating" class="form-control">
+                                        <option value="">— No rating —</option>
+                                        @for($i = 5; $i >= 1; $i--)
+                                        <option value="{{ $i }}" {{ $review->rating == $i ? 'selected' : '' }}>
+                                            {{ $i }} star{{ $i > 1 ? 's' : '' }}
+                                        </option>
+                                        @endfor
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Related Movie</label>
+                                    <select name="movie_id" class="form-control">
+                                        <option value="">— General / No movie —</option>
+                                        @foreach($movies as $movie)
+                                        <option value="{{ $movie->id }}" {{ $review->movie_id == $movie->id ? 'selected' : '' }}>
+                                            {{ $movie->title }}
+                                        </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Sort Order</label>
+                                    <input type="number" name="sort_order" class="form-control"
+                                        value="{{ $review->sort_order }}">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Active</label>
+                                    <label class="toggle-label">
+                                        <input type="checkbox" name="is_active" value="1"
+                                            {{ $review->is_active ? 'checked' : '' }}>
+                                        Show publicly
+                                    </label>
+                                </div>
+                                <div class="form-group full">
+                                    <label class="form-label">Review Text *</label>
+                                    <textarea name="body" class="form-control" rows="5" required>{{ $review->body }}</textarea>
+                                </div>
+                                <div class="form-group full">
+                                    <label class="form-label">Reviewer Photo</label>
+                                    <div class="file-input-wrap">
+                                        <label class="file-input-label" style="font-size:11px;">
+                                            <i class="fas fa-image"></i>
+                                            {{ $review->photo ? basename($review->photo) : 'Replace photo…' }}
+                                        </label>
+                                        <input type="file" name="photo" accept="image/*">
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="margin-top:16px;">
+                                <button type="submit" class="btn btn-gold btn-sm">
+                                    <i class="fas fa-save"></i> Update Review
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            @empty
+            <div style="text-align:center;padding:60px;color:var(--muted);">
+                <i class="fas fa-star" style="font-size:2rem;display:block;margin-bottom:12px;"></i>
+                No reviews yet. Add the first one!
+            </div>
+            @endforelse
+        </div>
 
     </main>
 </div>

@@ -32,6 +32,6 @@ class Movie extends Model
         if (!$this->video_youtube) return null;
 
         preg_match('/(?:v=|youtu\.be\/)([A-Za-z0-9_\-]{11})/', $this->video_youtube, $m);
-        return isset($m[1]) ? "https://www.youtube.com/embed/{$m[1]}?autoplay=0&rel=0" : null;
+        return isset($m[1]) ? "https://www.youtube.com/embed/{$m[1]}" : null;
     }
 }

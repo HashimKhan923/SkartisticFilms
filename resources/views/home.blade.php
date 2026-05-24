@@ -845,9 +845,8 @@ body {
 .sw-item:hover { background: rgba(201,168,76,.05); }
 
 .sw-icon {
-    width: 48px; height: 48px;
+    height: 56px;
     margin: 0 auto 12px;
-    border: 1px solid rgba(201,168,76,.18);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -856,7 +855,8 @@ body {
     transition: all .25s;
 }
 
-.sw-item:hover .sw-icon { background: rgba(201,168,76,.08); border-color: var(--gold); }
+.sw-icon img { transition: opacity .25s; }
+.sw-item:hover .sw-icon img { opacity: .85; }
 
 .sw-name {
     font-family: 'Barlow', sans-serif;
@@ -1075,7 +1075,11 @@ textarea.cf-field { resize: none; }
     position: absolute;
     inset: 0;
     background: linear-gradient(to top, #181818 0%, transparent 55%);
+    transition: opacity .3s;
 }
+
+.nf-modal-hero.playing::after { opacity: 0; pointer-events: none; }
+.nf-modal-hero.playing .nf-modal-hero-content { opacity: 0; pointer-events: none; }
 
 .nf-modal-hero-content {
     position: absolute;
@@ -1586,6 +1590,7 @@ textarea.cf-field { resize: none; }
 @endif
 
 {{-- ═══════════ SOFTWARE ═══════════ --}}
+@if($software->isNotEmpty())
 <section id="software" class="section">
     <div class="container">
         <div style="text-align:center;margin-bottom:48px;" data-aos="fade-up">
@@ -1595,28 +1600,28 @@ textarea.cf-field { resize: none; }
             </h2>
         </div>
         <div class="software-row" data-aos="fade-up" data-aos-delay="60">
-            @php
-                $sws = [
-                    ['icon'=>'fas fa-video',       'name'=>'Adobe Premiere Pro',  'role'=>'Video Editing'],
-                    ['icon'=>'fas fa-magic',        'name'=>'After Effects',       'role'=>'VFX & Motion'],
-                    ['icon'=>'fas fa-adjust',       'name'=>'DaVinci Resolve',     'role'=>'Color Grading'],
-                    ['icon'=>'fas fa-headphones',   'name'=>'Adobe Audition',      'role'=>'Sound Design'],
-                    ['icon'=>'fas fa-layer-group',  'name'=>'Photoshop',           'role'=>'Graphics'],
-                    ['icon'=>'fas fa-cube',         'name'=>'Cinema 4D',           'role'=>'3D & Animation'],
-                ];
-            @endphp
-            @foreach($sws as $sw)
+            @foreach($software as $sw)
             <div class="sw-item">
-                <div class="sw-icon"><i class="{{ $sw['icon'] }}"></i></div>
-                <p class="sw-name">{{ $sw['name'] }}</p>
-                <p class="sw-role">{{ $sw['role'] }}</p>
+                <div class="sw-icon">
+                    @if($sw->image)
+                        <img src="{{ asset('uploads/' . $sw->image) }}"
+                             style="width:{{ $sw->width }}px;height:auto;object-fit:contain;"
+                             alt="{{ $sw->name }}">
+                    @else
+                        <i class="fas fa-tools"></i>
+                    @endif
+                </div>
+                <p class="sw-name">{{ $sw->name }}</p>
+                @if($sw->role)<p class="sw-role">{{ $sw->role }}</p>@endif
             </div>
             @endforeach
         </div>
     </div>
 </section>
+@endif
 
 {{-- ═══════════ REVIEWS ═══════════ --}}
+@if($reviews->isNotEmpty())
 <section id="reviews" class="section">
     <div class="container">
         <div style="text-align:center;margin-bottom:48px;" data-aos="fade-up">
@@ -1626,24 +1631,33 @@ textarea.cf-field { resize: none; }
             </h2>
         </div>
         <div class="reviews-grid">
-            @php
-                $revs = [
-                    ['text'=>'An extraordinary team with an unmatched eye for storytelling. Every frame they produce is a masterpiece.','name'=>'Ahmad Raza','role'=>'Film Critic','stars'=>5],
-                    ['text'=>'SK Artistic Films brought our vision to life with professionalism and artistry we had never experienced before.','name'=>'Sana Malik','role'=>'Producer','stars'=>5],
-                    ['text'=>'Working with this team was transformative. Their passion for cinema is evident in every scene they compose.','name'=>'Omar Farooq','role'=>'Director','stars'=>5],
-                ];
-            @endphp
-            @foreach($revs as $i => $rev)
+            @foreach($reviews as $i => $review)
             <div class="review-card" data-aos="fade-up" data-aos-delay="{{ $i * 100 }}">
+                @if($review->rating)
                 <div class="review-stars">
-                    @for($s=0;$s<$rev['stars'];$s++)<i class="fas fa-star"></i>@endfor
+                    @for($s = 1; $s <= 5; $s++)
+                        <i class="fas fa-star" style="{{ $s <= $review->rating ? '' : 'color:rgba(255,255,255,.15);' }}"></i>
+                    @endfor
                 </div>
-                <p class="review-text">"{{ $rev['text'] }}"</p>
+                @endif
+                <p class="review-text">"{{ $review->body }}"</p>
                 <div class="review-author">
-                    <div class="review-avatar">{{ strtoupper(substr($rev['name'],0,1)) }}</div>
+                    @if($review->photo)
+                        <img src="{{ asset('uploads/' . $review->photo) }}"
+                             class="review-avatar"
+                             style="object-fit:cover;"
+                             alt="{{ $review->reviewer_name }}">
+                    @else
+                        <div class="review-avatar">{{ strtoupper(substr($review->reviewer_name, 0, 1)) }}</div>
+                    @endif
                     <div>
-                        <p class="review-name">{{ $rev['name'] }}</p>
-                        <p class="review-role">{{ $rev['role'] }}</p>
+                        <p class="review-name">{{ $review->reviewer_name }}</p>
+                        @if($review->reviewer_title)
+                        <p class="review-role">{{ $review->reviewer_title }}</p>
+                        @endif
+                        @if($review->movie)
+                        <p class="review-role" style="color:rgba(201,168,76,.6);">{{ $review->movie->title }}</p>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -1651,6 +1665,7 @@ textarea.cf-field { resize: none; }
         </div>
     </div>
 </section>
+@endif
 
 {{-- ═══════════ CONTACT ═══════════ --}}
 <section id="contact" class="section">
@@ -1709,7 +1724,7 @@ textarea.cf-field { resize: none; }
 <div class="nf-modal-backdrop" id="nfModal" onclick="handleModalBackdropClick(event)">
     <div class="nf-modal" id="nfModalBox">
         <button class="nf-modal-close" id="nfModalCloseBtn">✕</button>
-        <div class="nf-modal-hero">
+        <div class="nf-modal-hero" id="nfModalHero">
             <div id="nfModalMedia" style="width:100%;height:100%;"></div>
             <div class="nf-modal-hero-content">
                 <h2 class="nf-modal-title" id="nfModalTitle"></h2>
@@ -1816,23 +1831,24 @@ function openNfModal(id) {
     const m = MOVIES[id];
     if (!m) return;
 
-    let media = '';
-    if (m.videoType === 'youtube' && m.videoYt) {
-        media = `<iframe src="${m.videoYt}?autoplay=1&mute=1" allow="autoplay;fullscreen" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:none;"></iframe>`;
-    } else if (m.videoType === 'upload' && m.videoFile) {
-        media = `<video autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;"><source src="${m.videoFile}"></video>`;
-    } else if (m.banner) {
-        media = `<img src="${m.banner}" style="width:100%;height:100%;object-fit:cover;" alt="${m.title}">`;
-    } else {
-        media = `<div style="width:100%;height:100%;background:#111;display:flex;align-items:center;justify-content:center;"><i class="fas fa-film" style="font-size:4rem;color:rgba(255,255,255,.06);"></i></div>`;
+    // Always show poster first — never auto-play on open
+    // Fall back to YouTube's auto-generated thumbnail if no banner/poster is uploaded
+    let posterUrl = m.banner;
+    if (!posterUrl && m.videoType === 'youtube' && m.videoYt) {
+        const ytId = m.videoYt.split('/embed/')[1];
+        if (ytId) posterUrl = `https://img.youtube.com/vi/${ytId}/maxresdefault.jpg`;
     }
+    const media = posterUrl
+        ? `<img src="${posterUrl}" style="width:100%;height:100%;object-fit:cover;" alt="${m.title}">`
+        : `<div style="width:100%;height:100%;background:#111;display:flex;align-items:center;justify-content:center;"><i class="fas fa-film" style="font-size:4rem;color:rgba(255,255,255,.06);"></i></div>`;
 
-    document.getElementById('nfModalMedia').innerHTML  = media;
+    document.getElementById('nfModalHero').classList.remove('playing');
+    document.getElementById('nfModalMedia').innerHTML   = media;
     document.getElementById('nfModalTitle').textContent = m.title;
 
     let btns = '';
     if (m.videoYt || m.videoFile) {
-        btns += `<button class="btn-nf-play" style="font-size:13px;padding:10px 24px;" onclick="playFull(${m.id})"><i class="fas fa-play"></i> Play</button>`;
+        btns = `<button class="btn-nf-play" style="font-size:13px;padding:10px 24px;" onclick="playFull(${m.id})"><i class="fas fa-play"></i> Play</button>`;
     }
     document.getElementById('nfModalBtns').innerHTML = btns;
 
@@ -1853,8 +1869,30 @@ function openNfModal(id) {
     document.body.style.overflow = 'hidden';
 }
 
+function playFull(id) {
+    const m = MOVIES[id];
+    if (!m) return;
+
+    // Hide the gradient overlay and title so all player controls are accessible
+    document.getElementById('nfModalHero').classList.add('playing');
+
+    if (m.videoType === 'youtube' && m.videoYt) {
+        document.getElementById('nfModalMedia').innerHTML =
+            `<iframe src="${m.videoYt}?autoplay=1&controls=1&rel=0&modestbranding=1&fs=1"
+             allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+             allowfullscreen
+             style="position:absolute;inset:0;width:100%;height:100%;border:none;"></iframe>`;
+    } else if (m.videoFile) {
+        document.getElementById('nfModalMedia').innerHTML =
+            `<video controls autoplay style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;">
+                <source src="${m.videoFile}">
+             </video>`;
+    }
+}
+
 function closeNfModal() {
     document.getElementById('nfModal').classList.remove('open');
+    document.getElementById('nfModalHero').classList.remove('playing');
     document.getElementById('nfModalMedia').innerHTML = '';
     document.body.style.overflow = '';
 }
@@ -1865,15 +1903,5 @@ function handleModalBackdropClick(e) {
 
 document.getElementById('nfModalCloseBtn').addEventListener('click', closeNfModal);
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeNfModal(); });
-
-function playFull(id) {
-    const m = MOVIES[id];
-    if (!m) return;
-    const src  = m.videoType === 'youtube' ? m.videoYt + '?autoplay=1' : m.videoFile;
-    const isYt = m.videoType === 'youtube';
-    document.getElementById('nfModalMedia').innerHTML = isYt
-        ? `<iframe src="${src}" allow="autoplay;fullscreen" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:none;"></iframe>`
-        : `<video controls autoplay style="width:100%;height:100%;object-fit:cover;"><source src="${src}"></video>`;
-}
 </script>
 @endsection

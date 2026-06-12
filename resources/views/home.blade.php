@@ -1174,7 +1174,7 @@ textarea.cf-field { resize: none; }
 /* Tablet portrait */
 @media (max-width: 900px) {
     /* Hero */
-    .hero-content       { padding: 0 24px; max-width: 100%; }
+    .hero-content       { padding: 0 24px !important; max-width: 100% !important; }
     .hero-movie-title   { font-size: clamp(2.8rem, 9vw, 5rem) !important; }
     .hero-rating        { bottom: 18%; font-size: 12px; padding: 5px 14px 5px 12px; }
 
@@ -1207,8 +1207,10 @@ textarea.cf-field { resize: none; }
 /* Mobile */
 @media (max-width: 600px) {
     /* Hero */
-    .hero-content       { padding: 0 18px; }
-    .hero-movie-title   { font-size: clamp(2.2rem, 11vw, 3.2rem) !important; line-height: 1; }
+    .hero-content-wrap  { padding-left: 0 !important; padding-right: 0 !important; }
+    .hero-content       { padding: 0 18px !important; max-width: 100% !important; width: 100% !important; }
+    .hero-movie-title   { font-size: clamp(2.2rem, 10vw, 3rem) !important; line-height: 1 !important; word-break: break-word; }
+    .hero-studio-tag    { font-size: 11px !important; letter-spacing: .14em !important; }
     .hero-tagline       { font-size: 13px; }
     .hero-desc          { font-size: 13px; margin-bottom: 14px; max-width: 100%; }
     .hero-actions       { flex-direction: column; gap: 10px; }
@@ -1266,10 +1268,18 @@ textarea.cf-field { resize: none; }
 /* Small phones */
 @media (max-width: 400px) {
     .hero-movie-title   { font-size: 2rem !important; }
+    .hero-studio-tag    { font-size: 10px !important; letter-spacing: .1em !important; }
     .banners-six-grid   { grid-template-columns: repeat(2,1fr); gap: 4px; padding: 0 12px; }
     .banners-row-header { padding: 0 12px; }
     .software-row       { grid-template-columns: repeat(2,1fr); }
     .clock-digit        { width: 38px; height: 52px; font-size: 1.5rem; }
+}
+
+/* Global overflow containment for all sections */
+#hero, #ticker, #banners, #films, #about, #characters,
+#countdown-section, #projects, #software, #reviews,
+#contact, footer {
+    overflow-x: hidden;
 }
 </style>
 @endsection

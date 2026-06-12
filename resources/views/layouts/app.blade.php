@@ -42,7 +42,11 @@
         }
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        html { scroll-behavior: smooth; }
+        html {
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+            max-width: 100%;
+        }
 
         body {
             background: var(--dark);
@@ -51,6 +55,7 @@
             font-weight: 400;
             line-height: 1.5;
             overflow-x: hidden;
+            max-width: 100%;
         }
 
         ::-webkit-scrollbar { width: 4px; }
@@ -182,6 +187,7 @@
         .nav-logo-img {
             height: 60px;
             width: auto;
+            max-width: 160px;
         }
 
         /* Text logo when no image — Netflix-like bold wordmark */
@@ -561,7 +567,7 @@
         @media (max-width: 600px) {
             .section    { padding: 60px 0; }
             .container  { padding: 0 16px; }
-            .nav-inner  { padding: 0 16px; }
+            .nav-inner  { padding: 0 16px; max-width: 100vw; }
 
             /* Footer: single column */
             .footer-grid { grid-template-columns: 1fr !important; gap: 28px !important; }

@@ -180,7 +180,7 @@
         }
 
         .nav-logo-img {
-            height: 32px;
+            height: 60px;
             width: auto;
         }
 
@@ -524,7 +524,7 @@
 
         /* ── Responsive ── */
         @media (max-width: 900px) {
-            .container { padding: 0 24px; }
+            .container  { padding: 0 24px; }
             .nav-inner  { padding: 0 24px; }
             .nav-ham    { display: flex; }
             .nav-primary,
@@ -541,6 +541,7 @@
                 border-top: 1px solid rgba(255,255,255,.06);
                 backdrop-filter: blur(12px);
                 gap: 0;
+                z-index: 999;
             }
 
             .nav-primary.open li a { padding: 14px 32px; font-size: 15px; }
@@ -552,10 +553,25 @@
                 right: 24px;
                 gap: 16px;
             }
+
+            /* Footer: 2 columns */
+            .footer-grid { grid-template-columns: 1fr 1fr !important; gap: 32px !important; }
         }
 
         @media (max-width: 600px) {
-            .section { padding: 60px 0; }
+            .section    { padding: 60px 0; }
+            .container  { padding: 0 16px; }
+            .nav-inner  { padding: 0 16px; }
+
+            /* Footer: single column */
+            .footer-grid { grid-template-columns: 1fr !important; gap: 28px !important; }
+
+            /* Footer bottom bar */
+            footer > div > div:last-child {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
         }
     </style>
 </head>
@@ -655,7 +671,7 @@
 ════════════════════════════════════════ --}}
 <footer style="background:#000;border-top:1px solid rgba(255,255,255,.06);padding:56px 0 28px;">
     <div class="container">
-        <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;margin-bottom:48px;">
+        <div class="footer-grid" style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;margin-bottom:48px;">
 
             {{-- Brand --}}
             <div>
@@ -787,31 +803,33 @@
 
     sections.forEach(s => navObserver.observe(s));
 
-    /* ── Search expand ── */
+    /* ── Search expand (only wires up if element exists in DOM) ── */
     const searchWrap  = document.getElementById('navSearchWrap');
     const searchBtn   = document.getElementById('navSearchBtn');
     const searchInput = document.getElementById('navSearchInput');
 
-    searchBtn.addEventListener('click', e => {
-        e.stopPropagation();
-        const isOpen = searchWrap.classList.toggle('open');
-        if (isOpen) searchInput.focus();
-        else searchInput.value = '';
-    });
+    if (searchBtn && searchWrap && searchInput) {
+        searchBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            const isOpen = searchWrap.classList.toggle('open');
+            if (isOpen) searchInput.focus();
+            else searchInput.value = '';
+        });
 
-    document.addEventListener('click', e => {
-        if (!searchWrap.contains(e.target)) {
-            searchWrap.classList.remove('open');
-            searchInput.value = '';
-        }
-    });
+        document.addEventListener('click', e => {
+            if (!searchWrap.contains(e.target)) {
+                searchWrap.classList.remove('open');
+                searchInput.value = '';
+            }
+        });
 
-    searchInput.addEventListener('keydown', e => {
-        if (e.key === 'Escape') {
-            searchWrap.classList.remove('open');
-            searchInput.value = '';
-        }
-    });
+        searchInput.addEventListener('keydown', e => {
+            if (e.key === 'Escape') {
+                searchWrap.classList.remove('open');
+                searchInput.value = '';
+            }
+        });
+    }
 
     /* ── Mobile nav ── */
     const hamBtn     = document.getElementById('navHam');

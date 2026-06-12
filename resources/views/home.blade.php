@@ -1164,27 +1164,112 @@ textarea.cf-field { resize: none; }
 /* ═══════════════════════════════════════
    RESPONSIVE
 ═══════════════════════════════════════ */
+/* Large tablet */
 @media (max-width: 1100px) {
     .banners-six-grid { grid-template-columns: repeat(3,1fr); }
-    .software-row { grid-template-columns: repeat(3,1fr); }
+    .software-row     { grid-template-columns: repeat(3,1fr); }
+    .reviews-grid     { grid-template-columns: repeat(2,1fr); }
 }
 
+/* Tablet portrait */
 @media (max-width: 900px) {
-    .hero-content { padding: 0 24px; }
+    /* Hero */
+    .hero-content       { padding: 0 24px; max-width: 100%; }
+    .hero-movie-title   { font-size: clamp(2.8rem, 9vw, 5rem) !important; }
+    .hero-rating        { bottom: 18%; font-size: 12px; padding: 5px 14px 5px 12px; }
+
+    /* Banners */
     .banners-row-header { padding: 0 24px; }
-    .banners-six-grid { grid-template-columns: repeat(2,1fr); padding: 0 24px; gap: 8px; }
-    .about-grid,
-    .contact-grid { grid-template-columns: 1fr; gap: 48px; }
-    .reviews-grid { grid-template-columns: 1fr; }
-    .projects-mosaic { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+    .banners-six-grid   { grid-template-columns: repeat(3,1fr); padding: 0 24px; gap: 8px; }
+
+    /* About */
+    .about-grid         { grid-template-columns: 1fr; gap: 40px; }
+    .about-img-wrap::before { display: none; }
+    .about-badge        { bottom: 0; right: 0; }
+
+    /* Projects */
+    .projects-mosaic    { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
     .project-tile:first-child { grid-row: span 1; }
-    .nf-modal-body { grid-template-columns: 1fr; }
-    .software-row { grid-template-columns: repeat(2,1fr); }
+
+    /* Software */
+    .software-row       { grid-template-columns: repeat(3,1fr); }
+
+    /* Reviews */
+    .reviews-grid       { grid-template-columns: repeat(2,1fr); }
+
+    /* Contact */
+    .contact-grid       { grid-template-columns: 1fr; gap: 40px; }
+
+    /* Modal */
+    .nf-modal-body      { grid-template-columns: 1fr; gap: 16px; }
 }
 
+/* Mobile */
 @media (max-width: 600px) {
-    .banners-six-grid { grid-template-columns: repeat(2,1fr); gap: 5px; }
-    .clock-digit { width: 48px; height: 64px; font-size: 2rem; }
+    /* Hero */
+    .hero-content       { padding: 0 18px; }
+    .hero-movie-title   { font-size: clamp(2.2rem, 11vw, 3.2rem) !important; line-height: 1; }
+    .hero-tagline       { font-size: 13px; }
+    .hero-desc          { font-size: 13px; margin-bottom: 14px; max-width: 100%; }
+    .hero-actions       { flex-direction: column; gap: 10px; }
+    .btn-nf-play,
+    .btn-nf-info        { width: 100%; justify-content: center; font-size: 14px; padding: 12px 20px; }
+    .hero-badges        { gap: 5px; }
+    .hero-rating        { display: none; }
+
+    /* Banners */
+    .banners-row-header { padding: 0 16px; }
+    .banners-six-grid   { grid-template-columns: repeat(2,1fr); gap: 5px; padding: 0 16px; }
+
+    /* Films — override inline padding */
+    .films-header       { padding: 0 16px !important; }
+    #filmsTrack         { padding-left: 16px !important; padding-right: 0 !important; }
+
+    /* About */
+    .about-img-wrap::before { display: none; }
+    .about-badge        { bottom: 0; right: 0; padding: 14px 18px; }
+    .about-badge .num   { font-size: 2rem; }
+
+    /* Projects */
+    .projects-mosaic    { grid-template-columns: 1fr; gap: 4px; }
+    .projects-mosaic .project-tile:first-child { grid-row: span 1; }
+
+    /* Software */
+    .software-row       { grid-template-columns: repeat(2,1fr); }
+    .sw-item            { padding: 24px 12px; }
+
+    /* Reviews */
+    .reviews-grid       { grid-template-columns: 1fr; }
+
+    /* Countdown */
+    .clock-digit        { width: 44px; height: 58px; font-size: 1.8rem; }
+    .clock-sep          { font-size: 1.6rem; margin-top: 8px; }
+    .countdown-clock    { gap: 10px; }
+    .countdown-content  { padding: 50px 16px; }
+
+    /* Modal — bottom-sheet style */
+    .nf-modal-backdrop  { padding: 0; align-items: flex-end; }
+    .nf-modal           { border-radius: 14px 14px 0 0; max-height: 92vh; }
+    .nf-modal-body      { padding: 10px 18px 32px; gap: 14px; }
+    .nf-modal-hero-content { padding: 0 18px 16px; }
+    .nf-modal-title     { font-size: clamp(1.5rem, 6vw, 2.2rem); margin-bottom: 10px; }
+    .nf-modal-close     { top: 10px; right: 10px; }
+
+    /* Contact form — 2-col name/email → 1 col */
+    .cf-grid-2          { grid-template-columns: 1fr !important; }
+
+    /* Chars scroll arrows — hide, touch scroll is enough */
+    #charsLeft, #charsRight,
+    #filmsLeft, #filmsRight { display: none; }
+}
+
+/* Small phones */
+@media (max-width: 400px) {
+    .hero-movie-title   { font-size: 2rem !important; }
+    .banners-six-grid   { grid-template-columns: repeat(2,1fr); gap: 4px; padding: 0 12px; }
+    .banners-row-header { padding: 0 12px; }
+    .software-row       { grid-template-columns: repeat(2,1fr); }
+    .clock-digit        { width: 38px; height: 52px; font-size: 1.5rem; }
 }
 </style>
 @endsection
@@ -1397,7 +1482,7 @@ textarea.cf-field { resize: none; }
 
 {{-- ═══════════ MOVIES / FILMS PORTFOLIO ═══════════ --}}
 <section id="films" style="background:#0e0e0e;padding:70px 0;">
-    <div style="padding:0 60px;margin-bottom:24px;display:flex;align-items:flex-end;justify-content:space-between;" data-aos="fade-up">
+    <div class="films-header" style="padding:0 60px;margin-bottom:24px;display:flex;align-items:flex-end;justify-content:space-between;" data-aos="fade-up">
         <div>
             <p class="section-label">Our Portfolio</p>
             <h2 style="font-family:'Barlow',sans-serif;font-weight:800;text-transform:uppercase;font-size:clamp(1.6rem,3vw,2.4rem);color:#e5e5e5;margin:0;">
@@ -1705,7 +1790,7 @@ textarea.cf-field { resize: none; }
             </div>
             <div data-aos="fade-left">
                 <form style="display:flex;flex-direction:column;gap:12px;">
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div class="cf-grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                         <input type="text"  class="cf-field" placeholder="Your Name">
                         <input type="email" class="cf-field" placeholder="Email Address">
                     </div>
